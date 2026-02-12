@@ -22,3 +22,9 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Environment variables
+.env
+
+# Pilot data (contains participant responses)
+pilot/output/pilot_data.csv
