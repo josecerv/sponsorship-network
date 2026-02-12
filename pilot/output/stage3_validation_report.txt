@@ -1,0 +1,233 @@
+STAGE 3 EVALUATOR PILOT — VALIDATION REPORT
+============================================================
+Generated: 2026-02-12 12:58:13
+Survey: SV_6yEQEFjnFJ13klo
+
+─── QUICK SUMMARY ─────────────────────────────────
+  Complete responses:    22
+  Conditions covered:    6/8
+  Q1 stakes recorded:    22/22
+  Q2 stakes recorded:    0/22
+  Q1 stake: mean=56.5, SD=26.7
+──────────────────────────────────────────────────
+============================================================
+
+
+============================================================
+1. RESPONSE OVERVIEW
+============================================================
+  Total rows in export:   37
+  Filter date:            2026-02-12
+  Preview responses:      4
+  Incomplete responses:   1
+  Other dates excluded:   2
+  No embedded data (JS):  8
+  Usable (valid):         22
+  Available columns:      72
+
+============================================================
+2. EMBEDDED DATA COMPLETENESS
+============================================================
+  Fields with missing data (out of 22 responses):
+    [BLOCKER] q1_rt (rt_ms_stage3_q1): 22/22 missing (100%)
+    [BLOCKER] q2_stake (stake_percent_q2): 22/22 missing (100%)
+    [BLOCKER] q2_rt (rt_ms_stage3_q2): 22/22 missing (100%)
+    [BLOCKER] outcome_rt (rt_ms_stage3_outcome): 22/22 missing (100%)
+
+============================================================
+3. CONDITION BALANCE (2x2x2 factorial)
+============================================================
+  Total responses: 22
+  Unique conditions seen: 6
+
+  [WARNING] Missing conditions: ['M_correct_weak', 'W_incorrect_weak']
+  Condition distribution:
+    M_correct_strong                  2  ##
+    M_correct_weak                    0  
+    M_incorrect_strong                7  #######
+    M_incorrect_weak                  3  ###
+    W_correct_strong                  3  ###
+    W_correct_weak                    3  ###
+    W_incorrect_strong                4  ####
+    W_incorrect_weak                  0  
+
+  Factor-level totals:
+    Endorser gender:   Man=12  Woman=10
+    Correctness:       Correct=8  Incorrect=14
+    Strength:          Strong=16  Weak=6
+
+============================================================
+4. STAKE DECISION VARIANCE
+============================================================
+
+  --- Q1 Stake (stake_percent_q1) ---
+  N valid:  22
+  Range:    10.0 – 100.0
+  Mean:     56.5  (SD=26.7)
+  Median:   50.0  (IQR: 37.0 – 75.0)
+  Distribution:
+       0-20:   3  ###
+      21-40:   3  ###
+      41-60:   7  #######
+      61-80:   5  #####
+     81-100:   4  ####
+
+  --- Q2 Stake (stake_percent_q2) ---
+  [BLOCKER] Only 0 valid values, cannot compute stats.
+
+  --- Stake by condition (Q1) ---
+    M_correct_strong                n= 2  mean= 55.0  SD= 42.4
+    M_correct_weak                  n= 0  (no data)
+    M_incorrect_strong              n= 7  mean= 62.0  SD= 21.5
+    M_incorrect_weak                n= 3  mean= 16.7  SD=  5.8
+    W_correct_strong                n= 3  mean= 78.3  SD= 20.2
+    W_correct_weak                  n= 3  mean= 53.7  SD=  6.4
+    W_incorrect_strong              n= 4  mean= 63.5  SD= 30.8
+    W_incorrect_weak                n= 0  (no data)
+
+============================================================
+5. RESPONSE TIMES
+============================================================
+
+  --- Q1 RT (rt_ms_stage3_q1) ---
+  Only 0 valid values
+
+  --- Q2 RT (rt_ms_stage3_q2) ---
+  Only 0 valid values
+
+  --- Outcome RT (rt_ms_stage3_outcome) ---
+  Only 0 valid values
+
+============================================================
+6. ENDORSER USAGE
+============================================================
+  Unique endorsers shown: 19
+  Endorser gender distribution: {'Woman': 10, 'Man': 12}
+
+  Endorser usage frequency:
+    6398db762e009c7af9e1da88: 2
+    66ccca31c45aad520357f3fb: 2
+    59e7477e3e4b5a00016aa4d2: 2
+    61bb392e40db417c1a138dcb: 1
+    5eac686d82cc012af1e953c7: 1
+    55d234b45bc5bc0005d9039d: 1
+    5bf4afe0b8e9f800014c9c0b: 1
+    67a95d468d14bd6324b4bbba: 1
+    570521cfde5095001018a0c8: 1
+    663e26ccdbc470527165388b: 1
+    63ed04d2ce3b27bda2fbbb9c: 1
+    5c005838232b6c0001221acf: 1
+    65714a2185b7c4c7ee00ddcd: 1
+    5e5731e3e1e8b90e25c1f3a2: 1
+    63d5b810f3dbbd11e7e65870: 1
+    67215f2922159d42abf932a4: 1
+    5d537c0cecc84200153075e9: 1
+    66b01097e95b0626c2cd7b5c: 1
+    655f96e689f922fe983fed35: 1
+
+============================================================
+7. CANDIDATE PAIR USAGE
+============================================================
+
+  --- Q1 pairs (stage3_q1_pair_id) ---
+  Unique pairs: 7
+    dominant_woman_wins                       6
+    dominant_man_wins                         1
+    misleading_woman_looks_better             6
+    misleading_man_looks_better               2
+    close_woman_wins                          1
+    identical_woman_woman                     5
+    unknown_woman_gk                          1
+    unknown_man_word                          0
+    split_unknowns                            0
+    man_vs_man                                0
+
+  --- Q2 pairs (stage3_q2_pair_id) ---
+  Unique pairs: 9
+    dominant_woman_wins                       0
+    dominant_man_wins                         2
+    misleading_woman_looks_better             2
+    misleading_man_looks_better               5
+    close_woman_wins                          2
+    identical_woman_woman                     1
+    unknown_woman_gk                          4
+    unknown_man_word                          1
+    split_unknowns                            2
+    man_vs_man                                3
+
+============================================================
+8. ENDORSER SLIDER VALUES
+============================================================
+
+  --- Q1 endorser slider (endorser_slider_value_q1) ---
+  N valid: 22
+  Range: 0.0 – 100.0
+  Mean: 36.5  SD=41.4
+  Strength (abs distance from 50): mean=36.8, range=1.0–50.0
+
+  --- Q2 endorser slider (endorser_slider_value_q2) ---
+  N valid: 22
+  Range: 1.0 – 98.0
+  Mean: 34.9  SD=38.2
+  Strength (abs distance from 50): mean=39.5, range=25.0–49.0
+
+============================================================
+9. PARTICIPANT DEMOGRAPHICS
+============================================================
+
+  gender (field: gender):
+    1: 12
+    2: 8
+    3: 2
+
+  age (field: age):
+    46: 3
+    60: 2
+    36: 2
+    29: 1
+    68: 1
+    20: 1
+    43: 1
+    34: 1
+    53: 1
+    38: 1
+    45: 1
+    42: 1
+    50: 1
+    51: 1
+    66: 1
+    23: 1
+    41: 1
+    35: 1
+
+  race (field: race):
+    5: 20
+    4: 1
+    3: 1
+
+============================================================
+10. INDIVIDUAL RESPONSE FLAGS
+============================================================
+  22 response(s) flagged:
+    R_6x5Y4zNoCQclAZz: no Q2 stake
+    R_7iVBwd5gHO9n4lx: no Q2 stake
+    R_11dZO3zJwRNYTDP: no Q2 stake
+    R_5q0zGSUqUc43F17: no Q2 stake
+    R_7Q0kEGRCNoXz8lB: no Q2 stake
+    R_7QtkybPmX6y4f9k: no Q2 stake
+    R_1scePSVDaNPTJJo: no Q2 stake
+    R_3f20ibLSxSzoXnz: no Q2 stake
+    R_1wFGKbieNrEnF74: no Q2 stake
+    R_3LzloCntTcJ9mBG: no Q2 stake
+    R_5B2K9MsEN0BzcVr: no Q2 stake
+    R_581ggx4l8YIFxYd: no Q2 stake
+    R_142ysLYNkxC5Dup: no Q2 stake
+    R_7vtADUJ1wbZJRhn: no Q2 stake
+    R_6E0ChYW6QVVqN35: no Q2 stake
+    R_1UcOumGPSBqIXBf: no Q2 stake
+    R_74IrXqD4vTNQNpX: no Q2 stake
+    R_57B7znVquzY4ZKp: no Q2 stake
+    R_3xygdnmpIvmDupD: no Q2 stake
+    R_3LYBoyPVTiz6EF3: no Q2 stake
+    R_3MuoUJQv1DUm4Ql: no Q2 stake
+    R_5Ce9rw5PaPERtSP: no Q2 stake
