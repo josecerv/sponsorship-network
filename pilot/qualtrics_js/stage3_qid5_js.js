@@ -16,27 +16,27 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   var textInput = qc.querySelector('input[type="text"], input.InputText, textarea');
   if (textInput) textInput.style.display = 'none';
 
-  // UI nodes
-  var endImg   = container.querySelector('#endorser_img');
-  var endMeta  = container.querySelector('#endorser_meta');
-  var selIDEl  = container.querySelector('#selected_id');
-  var eFill    = container.querySelector('#e_fill');
-  var eReading = container.querySelector('#e_reading');
+  // UI nodes — use document.getElementById for reliability across Qualtrics modes
+  var endImg   = document.getElementById('endorser_img');
+  var endMeta  = document.getElementById('endorser_meta');
+  var selIDEl  = document.getElementById('selected_id');
+  var eFill    = document.getElementById('e_fill');
+  var eReading = document.getElementById('e_reading');
 
   // Result-first UI
-  var yourAmt    = container.querySelector('#your_amount');
-  var yourReason = container.querySelector('#your_reason');
-  var endOutcome = container.querySelector('#endorser_outcome_pill');
+  var yourAmt    = document.getElementById('your_amount');
+  var yourReason = document.getElementById('your_reason');
+  var endOutcome = document.getElementById('endorser_outcome_pill');
 
   // Stake & payouts
-  var stakeFill  = container.querySelector('#stake_fill');
-  var stakeText  = container.querySelector('#stake_text');
-  var payCorrectEl   = container.querySelector('#pay_correct');
-  var payIncorrectEl = container.querySelector('#pay_incorrect');
-  var payBoxCorrect  = container.querySelector('#pay_box_correct');
-  var payBoxIncorrect= container.querySelector('#pay_box_incorrect');
-  var tagCorrect     = container.querySelector('#tag_happened_correct');
-  var tagIncorrect   = container.querySelector('#tag_happened_incorrect');
+  var stakeFill  = document.getElementById('stake_fill');
+  var stakeText  = document.getElementById('stake_text');
+  var payCorrectEl   = document.getElementById('pay_correct');
+  var payIncorrectEl = document.getElementById('pay_incorrect');
+  var payBoxCorrect  = document.getElementById('pay_box_correct');
+  var payBoxIncorrect= document.getElementById('pay_box_incorrect');
+  var tagCorrect     = document.getElementById('tag_happened_correct');
+  var tagIncorrect   = document.getElementById('tag_happened_incorrect');
 
   // Icons
   var ICON = {
@@ -74,7 +74,10 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   function populate(){
     // Header cards
     endImg.src = (endorserGender === "Woman") ? ICON.Woman : ICON.Man;
-    endImg.alt = "Endorser icon";
+    endImg.alt = endorserGender + " endorser";
+    endImg.onerror = function(){ this.style.display='none'; };
+    var badge = document.querySelector('#stage3-outcome .badge');
+    if (badge) badge.textContent = endorserGender + " Endorser";
     endMeta.textContent = "ID " + endorserId;
 
     selIDEl.textContent = selectedId;
@@ -123,9 +126,10 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     if (textInput) textInput.value = isCorrect ? 'correct' : 'incorrect';
   }
 
-  $(document).off('click.s3Outcome','#NextButton').on('click.s3Outcome','#NextButton',saveResponse);
-  if (typeof q.addOnUnload === 'function'){ q.addOnUnload(saveResponse); }
-  else { window.addEventListener('beforeunload', saveResponse); }
-
   populate();
+
+  var nextBtn = document.getElementById('NextButton');
+  if (nextBtn) nextBtn.addEventListener('click', saveResponse, true);
+  if (typeof q.addOnUnload === 'function') { q.addOnUnload(function(){ saveResponse(); }); }
+  else { window.addEventListener('beforeunload', saveResponse); }
 });

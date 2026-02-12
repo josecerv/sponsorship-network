@@ -24,22 +24,22 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   var textInput = qc.querySelector('input[type="text"], input.InputText, textarea');
   if (textInput) textInput.style.display = 'none';
 
-  // UI nodes
-  var endImg   = container.querySelector('#endorser_img');
-  var endMeta  = container.querySelector('#endorser_meta');
-  var selIDEl  = container.querySelector('#selected_id');
+  // UI nodes — use document.getElementById for reliability across Qualtrics modes
+  var endImg   = document.getElementById('endorser_img');
+  var endMeta  = document.getElementById('endorser_meta');
+  var selIDEl  = document.getElementById('selected_id');
 
   // Endorser slider (read-only display)
-  var eFill    = container.querySelector('#e_fill');
-  var eReading = container.querySelector('#e_reading');
+  var eFill    = document.getElementById('e_fill');
+  var eReading = document.getElementById('e_reading');
 
   // Evaluator stake slider (active)
-  var sRng     = container.querySelector('#stake_rng');
-  var sFill    = container.querySelector('#stake_fill');
-  var sBubble  = container.querySelector('#stake_bubble');
-  var sReading = container.querySelector('#stake_reading');
-  var sPayC    = container.querySelector('#pay_correct');
-  var sPayI    = container.querySelector('#pay_incorrect');
+  var sRng     = document.getElementById('stake_rng');
+  var sFill    = document.getElementById('stake_fill');
+  var sBubble  = document.getElementById('stake_bubble');
+  var sReading = document.getElementById('stake_reading');
+  var sPayC    = document.getElementById('pay_correct');
+  var sPayI    = document.getElementById('pay_incorrect');
 
   var ICON = {
     "Woman": "https://wharton.yul1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rPkPsDPTOJEHbxS",
@@ -228,7 +228,10 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   // ── Populate UI ──
   function populate(){
     endImg.src = (endorserGender === "Woman") ? ICON.Woman : ICON.Man;
-    endImg.alt = "Endorser icon";
+    endImg.alt = endorserGender + " endorser";
+    endImg.onerror = function(){ this.style.display='none'; };
+    var badge = document.querySelector('#stage3-eval .badge');
+    if (badge) badge.textContent = endorserGender + " Endorser";
     endMeta.textContent = "ID " + endorserId;
 
     selIDEl.textContent = chosen.id;
@@ -262,11 +265,24 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     if (textInput) textInput.value = v;
   }
 
-  sRng.addEventListener('input', updateStake);
+  // ── Slider validation: must interact before proceeding ──
+  var sliderTouched = false;
+  var valMsg = document.createElement('div');
+  valMsg.id = 'stake_validation_msg';
+  valMsg.style.cssText = 'color:#c0392b;font-weight:600;margin:8px 0 0;display:none;text-align:center;font-size:14px;';
+  valMsg.textContent = '\u26A0 Please adjust the slider to indicate your stake before continuing.';
+  if (sRng.parentNode) sRng.parentNode.appendChild(valMsg);
+
+  function markTouched(){ sliderTouched = true; valMsg.style.display = 'none'; }
+
+  sRng.addEventListener('input', function(){ markTouched(); updateStake(); });
+  sRng.addEventListener('mousedown', markTouched);
+  sRng.addEventListener('touchstart', markTouched);
+  sRng.addEventListener('pointerdown', markTouched);
   sRng.addEventListener('keydown', function (e) {
     var step = e.shiftKey ? 5 : 1;
-    if (e.key === 'ArrowLeft'){ sRng.value = Math.max(0, Number(sRng.value) - step); updateStake(); e.preventDefault(); }
-    if (e.key === 'ArrowRight'){ sRng.value = Math.min(100, Number(sRng.value) + step); updateStake(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft'){ markTouched(); sRng.value = Math.max(0, Number(sRng.value) - step); updateStake(); e.preventDefault(); }
+    if (e.key === 'ArrowRight'){ markTouched(); sRng.value = Math.min(100, Number(sRng.value) + step); updateStake(); e.preventDefault(); }
   });
 
   // ── Save on Next ──
@@ -279,10 +295,23 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     if (textInput) textInput.value = stake;
   }
 
-  $(document).off('click.s3Q1','#NextButton').on('click.s3Q1','#NextButton',saveResponse);
-  if (typeof q.addOnUnload === 'function'){ q.addOnUnload(saveResponse); }
-  else { window.addEventListener('beforeunload', saveResponse); }
-
   populate();
   updateStake();
+
+  // Save handlers — registered AFTER UI render so errors here don't block display
+  var nextBtn = document.getElementById('NextButton');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function(e){
+      if (!sliderTouched) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        valMsg.style.display = 'block';
+        sRng.focus();
+        return;
+      }
+      saveResponse();
+    }, true);
+  }
+  if (typeof q.addOnUnload === 'function') { q.addOnUnload(function(){ saveResponse(); }); }
+  else { window.addEventListener('beforeunload', saveResponse); }
 });
