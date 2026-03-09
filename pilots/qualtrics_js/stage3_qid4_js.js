@@ -1,8 +1,8 @@
 // ============================================================
 // QID4 — Stage 3, Q2: Second Evaluator Stake Decision
 // ============================================================
-// UPDATED: Reads Q2 pair + endorser slider from embedded data
-// (set by QID3's condition assignment) instead of randomizing.
+// UPDATED: $0.50 bank scheme, strength-based endorser display,
+// Q2 display strength held constant = Q1 strength.
 // ============================================================
 
 Qualtrics.SurveyEngine.addOnReady(function () {
@@ -80,11 +80,17 @@ Qualtrics.SurveyEngine.addOnReady(function () {
       truth:'A', truth_gender:'Man'}
   ];
 
-  function interpEndorser(v){
-    v = Number(v);
-    if (v === 50) return "Endorser was unsure";
-    if (v < 50)  return (v <= 15) ? "Endorser was very confident in Candidate A" : "Endorser leaned toward Candidate A";
-    return (v >= 85) ? "Endorser was very confident in Candidate B" : "Endorser leaned toward Candidate B";
+  // ── Helpers ──
+  function endorserStrength(v) {
+    return Math.abs(Number(v) - 50) * 2;
+  }
+
+  function interpStrength(s) {
+    s = Number(s);
+    if (s <= 5) return "unsure";
+    if (s <= 33) return "low confidence";
+    if (s <= 66) return "moderately confident";
+    return "very confident";
   }
 
   // ── Reuse the SAME endorser from Q1 (already set by QID3) ──
@@ -102,27 +108,36 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     trial = pool[Math.floor(Math.random() * pool.length)];
   }
 
-  // Read Q2 endorser slider value from embedded data
+  // Read Q2 endorser slider value from embedded data (raw bipolar 0-100)
   var rawEVal = Qualtrics.SurveyEngine.getEmbeddedData('endorser_slider_value_q2');
   var eVal = (rawEVal !== null && rawEVal !== undefined && rawEVal !== '')
     ? Number(rawEVal) : 50;
   if (eVal === 50) eVal = 49; // avoid neutral
 
+  // Determine which candidate the endorser favored (from real Q2 value)
   var favoredSide = (eVal > 50) ? 'B' : 'A';
   var chosen = (favoredSide === 'A') ? trial.A : trial.B;
 
+  // ── Q2 display strength = Q1 strength (held constant) ──
+  var rawQ1Sv = Qualtrics.SurveyEngine.getEmbeddedData('endorser_slider_value_q1');
+  var q1Sv = (rawQ1Sv !== null && rawQ1Sv !== undefined && rawQ1Sv !== '')
+    ? Number(rawQ1Sv) : 50;
+  var displayStrength = endorserStrength(q1Sv);
+
   function populate(){
     endImg.src = (endorserGender === "Woman") ? ICON.Woman : ICON.Man;
-    endImg.alt = endorserGender + " endorser";
+    endImg.alt = "Endorser";
     endImg.onerror = function(){ this.style.display='none'; };
     var badge = document.querySelector('#stage3-eval .badge');
-    if (badge) badge.textContent = endorserGender + " Endorser";
+    if (badge) badge.textContent = "Endorser";
     endMeta.textContent = "ID " + endorserId;
 
     selIDEl.textContent = chosen.id;
 
-    eFill.style.width = eVal + "%";
-    eReading.textContent = eVal + " \u2014 " + interpEndorser(eVal);
+    // Endorser confidence bar (display Q1's strength for constancy)
+    eFill.style.width = displayStrength + "%";
+    eReading.setAttribute('aria-label', 'Endorsement strength: ' + displayStrength + '%, ' + interpStrength(displayStrength));
+    eReading.textContent = displayStrength + "% \u2014 " + interpStrength(displayStrength);
 
     // Save Q2-specific data
     Qualtrics.SurveyEngine.setEmbeddedData('stage3_q2_pair_id', trial.pair_id);
@@ -131,6 +146,7 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     Qualtrics.SurveyEngine.setEmbeddedData('stage3_q2_selected_label', favoredSide);
     Qualtrics.SurveyEngine.setEmbeddedData('stage3_q2_selected_id', chosen.id);
     Qualtrics.SurveyEngine.setEmbeddedData('endorser_slider_value_q2', eVal);
+    Qualtrics.SurveyEngine.setEmbeddedData('endorser_display_strength_q2', displayStrength);
   }
 
   function updateStake(){
@@ -138,9 +154,9 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     sBubble.textContent = v + "%";
     sBubble.style.left  = v + "%";
     sFill.style.width   = v + "%";
-    sReading.textContent = "Stake " + v + "% of your $2 bonus.";
-    sPayC.textContent    = "$" + (2 * (v/100)).toFixed(2);
-    sPayI.textContent    = "$" + (2 * (1 - v/100)).toFixed(2);
+    sReading.textContent = "Wager " + v + "% of your $0.50 bank.";
+    sPayC.textContent    = "$" + (0.50 + 0.50 * (v/100)).toFixed(2);
+    sPayI.textContent    = "$" + (0.50 - 0.50 * (v/100)).toFixed(2);
 
     Qualtrics.SurveyEngine.setEmbeddedData('stake_percent_q2', v);
 
@@ -152,7 +168,7 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   var valMsg = document.createElement('div');
   valMsg.id = 'stake_validation_msg';
   valMsg.style.cssText = 'color:#c0392b;font-weight:600;margin:8px 0 0;display:none;text-align:center;font-size:14px;';
-  valMsg.textContent = '\u26A0 Please adjust the slider to indicate your stake before continuing.';
+  valMsg.textContent = '\u26A0 Please adjust the slider to indicate your wager before continuing.';
   if (sRng.parentNode) sRng.parentNode.appendChild(valMsg);
 
   function markTouched(){ sliderTouched = true; valMsg.style.display = 'none'; }

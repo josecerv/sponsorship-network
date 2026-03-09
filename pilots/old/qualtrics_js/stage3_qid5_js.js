@@ -74,10 +74,10 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   function populate(){
     // Header cards
     endImg.src = (endorserGender === "Woman") ? ICON.Woman : ICON.Man;
-    endImg.alt = endorserGender + " endorser";
+    endImg.alt = "Endorser";
     endImg.onerror = function(){ this.style.display='none'; };
     var badge = document.querySelector('#stage3-outcome .badge');
-    if (badge) badge.textContent = endorserGender + " Endorser";
+    if (badge) badge.textContent = "Endorser";
     endMeta.textContent = "ID " + endorserId;
 
     selIDEl.textContent = selectedId;

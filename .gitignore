@@ -23,6 +23,12 @@ Thumbs.db
 # Claude Code
 .claude/
 
+# VS Code
+.vscode/
+
+# Temp API responses
+pilots/output/_qid*_current.json
+
 # Environment variables
 .env
 

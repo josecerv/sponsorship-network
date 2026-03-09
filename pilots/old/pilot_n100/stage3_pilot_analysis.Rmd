@@ -81,6 +81,7 @@ df <- df %>%
     endorser_correct     = ifelse(grepl("_correct_", assigned_condition), 1, 0),
     endorser_strong      = ifelse(grepl("_strong$", assigned_condition), 1, 0),
     abs_strength_q1 = abs(endorser_slider_value_q1 - 50),
+    abs_strength_q2 = abs(endorser_slider_value_q2 - 50),
     endorser_gender_f = factor(endorser_gender_code, levels = c("Man", "Woman")),
     correctness_f     = factor(ifelse(endorser_correct == 1, "Correct", "Incorrect"),
                                levels = c("Incorrect", "Correct")),
@@ -108,7 +109,7 @@ s2 <- s2_raw %>%
   filter(!is.na(t1_slider_value) & trimws(t1_slider_value) != "")
 
 s2$endorser_gender <- case_when(
-  s2$gender == "1" ~ "Man", s2$gender == "2" ~ "Woman", TRUE ~ "Other"
+  s2$gender == "1" ~ "Woman", s2$gender == "2" ~ "Man", TRUE ~ "Other"
 )
 
 s2_long <- data.frame()
@@ -141,8 +142,6 @@ s2_trials <- s2_long %>%
   )
 ```
 
-# Overview
-
 ## Dependent Variables
 
 **Primary DV**: **Trust Change** (Decision 2 - Decision 1)
@@ -170,54 +169,9 @@ Each evaluator sees ONE sponsor making TWO decisions:
 - **RQ3/HQ3**: Do female sponsors need **higher** endorsement strength to achieve same initial trust?
 - **RQ4/HQ4**: Is trust change **more** contingent on endorsement strength $\times$ outcome for female sponsors?
 
-## Pilot Sample
-
-```{r sample-overview}
-funnel <- data.frame(
-  Step = c("Total export rows", "Exclude preview/incomplete",
-           "Valid PROLIFIC_PID", paste0("Target study (", TARGET_STUDY, ")"),
-           "Pass comprehension (Q42=2)", "Has condition + Q1 stake"),
-  N = c(nrow(d0), nrow(d2), nrow(d3), nrow(d3b), nrow(d4), nrow(df))
-)
-styled_kable(funnel, col.names = c("Filter Step", "N Remaining"))
-```
-
 ```{r sample-desc}
-cat("Final analytic sample: N =", nrow(df), "\n")
-cat("  Endorser gender: Man =", sum(df$endorser_gender_code == "Man"),
-    "| Woman =", sum(df$endorser_gender_code == "Woman"), "\n")
-cat("  Correctness: Correct =", sum(df$endorser_correct == 1),
-    "| Incorrect =", sum(df$endorser_correct == 0), "\n")
-cat("  Strength: Strong =", sum(df$endorser_strong == 1),
-    "| Weak =", sum(df$endorser_strong == 0), "\n")
-cat("  Trust change (Q2): N =", sum(!is.na(df$trust_change)), "\n")
-cat("  Median completion:", round(median(df$duration_min, na.rm = TRUE), 1), "min\n")
-
-# Manipulation check
+# Manipulation check (used later in robustness)
 df$q44_resp <- case_when(df$Q44 == "1" ~ "Man", df$Q44 == "2" ~ "Woman", TRUE ~ NA_character_)
-manip_acc <- mean(df$q44_resp == df$endorser_gender_code, na.rm = TRUE)
-cat("  Gender manipulation check accuracy:", round(manip_acc * 100, 1), "%\n")
-```
-
-```{r condition-balance, fig.height=4}
-cond_tbl <- df %>% count(assigned_condition) %>% arrange(assigned_condition)
-all_conds <- c("M_correct_strong", "M_correct_weak", "M_incorrect_strong",
-               "M_incorrect_weak", "W_correct_strong", "W_correct_weak",
-               "W_incorrect_strong", "W_incorrect_weak")
-cond_tbl <- data.frame(assigned_condition = all_conds) %>%
-  left_join(cond_tbl, by = "assigned_condition") %>%
-  mutate(n = ifelse(is.na(n), 0, n))
-
-ggplot(cond_tbl, aes(x = reorder(assigned_condition, -n), y = n)) +
-  geom_bar(stat = "identity", fill = PENN_BLUE, width = 0.7) +
-  geom_text(aes(label = n), vjust = -0.5, fontface = "bold") +
-  geom_hline(yintercept = nrow(df) / 8, linetype = "dashed", color = "gray50") +
-  labs(title = "Condition Assignment (N per cell)",
-       subtitle = paste0("Expected: ~", round(nrow(df) / 8, 1),
-                         " | Range: ", min(cond_tbl$n), "-", max(cond_tbl$n)),
-       x = NULL, y = "N") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10))
 ```
 
 \newpage
@@ -229,25 +183,30 @@ ggplot(cond_tbl, aes(x = reorder(assigned_condition, -n), y = n)) +
 ## Model
 
 $$
-\text{trust\_change}_{i} = \beta_0 + \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{Success}_{i} + \beta_3 (\texttt{Woman}_{i} \times \texttt{Success}_{i}) + \beta_4 \texttt{abs\_strength\_q1\_c}_{i} + \epsilon_{i}
+\text{trust\_change}_{i} = \beta_0 + \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{Success}_{i} + \beta_3 (\texttt{Woman}_{i} \times \texttt{Success}_{i}) + \beta_4 \texttt{abs\_str\_q1\_c}_{i} + \beta_5 \texttt{abs\_str\_q2\_c}_{i} + \epsilon_{i}
 $$
 
-**Variable definitions:**
-
-| Term in equation | R output name | Levels (reference in parentheses) |
-|:-----------------|:--------------|:----------------------------------|
-| $\texttt{Woman}_{i}$ | `endorser_gender_fWoman` | (**Man** = 0), Woman = 1 |
-| $\texttt{Success}_{i}$ | `outcome_fSuccess` | (**Failure** = 0), Success = 1 |
-| $\texttt{Woman} \times \texttt{Success}$ | `endorser_gender_fWoman:outcome_fSuccess` | Interaction |
-| $\texttt{abs\_strength\_q1\_c}_{i}$ | `abs_strength_q1_c` | Mean-centered |endorser slider - 50||
+```{r rq1-vars}
+rq1_vars <- data.frame(
+  Coefficient = c("Woman", "Success", "Woman x Success", "abs_strength_q1_c", "abs_strength_q2_c"),
+  R_Name = c("endorser_gender_fWoman", "outcome_fSuccess",
+             "...fWoman:outcome_fSuccess", "abs_strength_q1_c", "abs_strength_q2_c"),
+  Coding = c("Man = 0 (ref), Woman = 1", "Failure = 0 (ref), Success = 1",
+             "Interaction term", "Mean-centered |Q1 slider - 50|",
+             "Mean-centered |Q2 slider - 50|")
+)
+styled_kable(rq1_vars, col.names = c("Term", "Name in R output", "Coding"),
+             row.names = FALSE)
+```
 
 - $\beta_3$ tests HQ1: negative $\beta_3$ means the success boost is **smaller** for female sponsors
 
 ```{r rq1-model, results='markup'}
 df_tc <- df_tc %>%
-  mutate(abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE))
+  mutate(abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE),
+         abs_strength_q2_c = abs_strength_q2 - mean(abs_strength_q2, na.rm = TRUE))
 
-model_rq1 <- lm(trust_change ~ endorser_gender_f * outcome_f + abs_strength_q1_c,
+model_rq1 <- lm(trust_change ~ endorser_gender_f * outcome_f + abs_strength_q1_c + abs_strength_q2_c,
                  data = df_tc)
 summary(model_rq1)
 ```
@@ -258,7 +217,8 @@ summary(model_rq1)
 - **$\beta_1$ (`endorser_gender_fWoman`)**: How much trust change differs for **female sponsors after failure** (relative to male)
 - **$\beta_2$ (`outcome_fSuccess`)**: The success boost for **male sponsors** — how much more trust they get after success vs. failure
 - **$\beta_3$ (`endorser_gender_fWoman:outcome_fSuccess`)**: **HQ1 test** — how much **smaller** (if negative) the success boost is for female sponsors
-- **$\beta_4$ (`abs_strength_q1_c`)**: Controls for the pretreatment strength of the endorsement
+- **$\beta_4$ (`abs_strength_q1_c`)**: Controls for the pretreatment strength of the Q1 endorsement
+- **$\beta_5$ (`abs_strength_q2_c`)**: Controls for the strength of the Q2 endorsement (different candidate pair)
 
 \newpage
 
@@ -280,15 +240,15 @@ ggplot(rq1_stats,
   geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
                 position = position_dodge(0.8), width = 0.25) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n)),
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
             position = position_dodge(0.8),
-            vjust = 0.5, size = 4, fontface = "bold",
-            color = ifelse(abs(rq1_stats$mean_change) > 8, "white", "black")) +
+            size = 4, fontface = "bold", color = "black") +
   scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
   scale_y_continuous(limits = c(-25, 30), breaks = seq(-20, 30, 10)) +
   labs(
     title = "RQ1: Are Female Sponsors Punished More and Rewarded Less?",
-    subtitle = paste0("Trust Change from Decision 1 to Decision 2 | N = ", nrow(df_tc)),
+    subtitle = paste0("Trust Change by Gender x Outcome (collapsed across Strength) | N = ", nrow(df_tc)),
     x = "Decision 1 Outcome",
     y = "Mean Change in Trust (%)",
     fill = "Sponsor Gender"
@@ -315,13 +275,16 @@ $$
 \text{abs\_strength}_{ij} = \beta_0 + \beta_1 \texttt{Woman\_Sponsor}_{i} + \beta_2 \texttt{Woman\_Protege}_{j} + \beta_3 (\texttt{Woman\_Sponsor}_{i} \times \texttt{Woman\_Protege}_{j}) + u_{i} + \epsilon_{ij}
 $$
 
-**Variable definitions:**
-
-| Term in equation | R output name | Levels (reference in parentheses) |
-|:-----------------|:--------------|:----------------------------------|
-| $\texttt{Woman\_Sponsor}_{i}$ | `endorser_gender_fWoman` | (**Man** = 0), Woman = 1 |
-| $\texttt{Woman\_Protege}_{j}$ | `endorsed_gender_fWoman` | (**Man** = 0), Woman = 1 |
-| $u_{i}$ | `(1 | PROLIFIC_PID)` | Random intercept per endorser |
+```{r rq2-vars}
+rq2_vars <- data.frame(
+  Coefficient = c("Woman_Sponsor", "Woman_Protege", "Random intercept"),
+  R_Name = c("endorser_gender_fWoman", "endorsed_gender_fWoman", "(1 | PROLIFIC_PID)"),
+  Coding = c("Man = 0 (ref), Woman = 1", "Man = 0 (ref), Woman = 1",
+             "10 trials per endorser")
+)
+styled_kable(rq2_vars, col.names = c("Term", "Name in R output", "Coding"),
+             row.names = FALSE)
+```
 
 - $\beta_1$ tests HQ2: negative $\beta_1$ means female sponsors give weaker (closer to neutral) endorsements
 - Mixed model with random intercepts accounts for 10 repeated trials per endorser
@@ -390,13 +353,17 @@ $$
 \text{stake\_percent\_q1}_{i} = \beta_0 + \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{abs\_strength\_q1}_{i} + \beta_3 (\texttt{Woman}_{i} \times \texttt{abs\_strength\_q1}_{i}) + \epsilon_{i}
 $$
 
-**Variable definitions:**
-
-| Term in equation | R output name | Levels / range |
-|:-----------------|:--------------|:---------------|
-| $\text{stake\_percent\_q1}_{i}$ | `stake_percent_q1` | 0--100 (evaluator's initial trust) |
-| $\texttt{Woman}_{i}$ | `endorser_gender_fWoman` | (**Man** = 0), Woman = 1 |
-| $\texttt{abs\_strength\_q1}_{i}$ | `abs_strength_q1` | |slider - 50|; Weak $\approx$ 1--2, Strong = 50 |
+```{r rq3-vars}
+rq3_vars <- data.frame(
+  Coefficient = c("DV: stake_percent_q1", "Woman", "abs_strength_q1", "Woman x Strength"),
+  R_Name = c("stake_percent_q1", "endorser_gender_fWoman", "abs_strength_q1",
+             "...fWoman:abs_strength_q1"),
+  Coding = c("0-100 (evaluator initial trust)", "Man = 0 (ref), Woman = 1",
+             "|slider - 50|; Weak ~ 1-2, Strong = 50", "Interaction term")
+)
+styled_kable(rq3_vars, col.names = c("Term", "Name in R output", "Coding"),
+             row.names = FALSE)
+```
 
 - $\beta_2$: How much initial trust increases per unit of endorsement strength (for **male** sponsors)
 - $\beta_3$ tests HQ3: negative $\beta_3$ means female sponsors have a **shallower** slope (need more strength for same trust)
@@ -471,27 +438,32 @@ ggplot(rq3_stats,
 
 $$
 \begin{aligned}
-\text{trust\_change}_{i} = \beta_0 &+ \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{abs\_str\_c}_{i} + \beta_3 \texttt{Success}_{i} \\
-&+ \beta_4 (\texttt{Woman} \times \texttt{abs\_str\_c})_{i} \\
+\text{trust\_change}_{i} = \beta_0 &+ \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{abs\_str\_q1\_c}_{i} + \beta_3 \texttt{Success}_{i} \\
+&+ \beta_4 (\texttt{Woman} \times \texttt{abs\_str\_q1\_c})_{i} \\
 &+ \beta_5 (\texttt{Woman} \times \texttt{Success})_{i} \\
-&+ \beta_6 (\texttt{abs\_str\_c} \times \texttt{Success})_{i} \\
-&+ \beta_7 (\texttt{Woman} \times \texttt{abs\_str\_c} \times \texttt{Success})_{i} + \epsilon_{i}
+&+ \beta_6 (\texttt{abs\_str\_q1\_c} \times \texttt{Success})_{i} \\
+&+ \beta_7 (\texttt{Woman} \times \texttt{abs\_str\_q1\_c} \times \texttt{Success})_{i} \\
+&+ \beta_8 \texttt{abs\_str\_q2\_c}_{i} + \epsilon_{i}
 \end{aligned}
 $$
 
-**Variable definitions:**
-
-| Term in equation | R output name | Levels / range |
-|:-----------------|:--------------|:---------------|
-| $\texttt{Woman}$ | `endorser_gender_fWoman` | (**Man** = 0), Woman = 1 |
-| $\texttt{abs\_str\_c}$ | `abs_strength_q1_c` | Mean-centered |slider - 50| |
-| $\texttt{Success}$ | `outcome_fSuccess` | (**Failure** = 0), Success = 1 |
-| $\beta_7$ (3-way) | `endorser_gender_fWoman:abs_strength_q1_c:outcome_fSuccess` | |
+```{r rq4-vars}
+rq4_vars <- data.frame(
+  Coefficient = c("Woman", "abs_str_q1_c", "Success", "3-way interaction", "abs_str_q2_c"),
+  R_Name = c("endorser_gender_fWoman", "abs_strength_q1_c", "outcome_fSuccess",
+             "...fWoman:abs_strength_q1_c:...fSuccess", "abs_strength_q2_c"),
+  Coding = c("Man = 0 (ref), Woman = 1", "Mean-centered |Q1 slider - 50|",
+             "Failure = 0 (ref), Success = 1", "Gender x Strength x Outcome",
+             "Mean-centered |Q2 slider - 50|")
+)
+styled_kable(rq4_vars, col.names = c("Term", "Name in R output", "Coding"),
+             row.names = FALSE)
+```
 
 - $\beta_7$ tests HQ4: positive $\beta_7$ means the strength $\times$ outcome interaction is **stronger** for female sponsors
 
 ```{r rq4-model, results='markup'}
-model_rq4 <- lm(trust_change ~ endorser_gender_f * abs_strength_q1_c * outcome_f,
+model_rq4 <- lm(trust_change ~ endorser_gender_f * abs_strength_q1_c * outcome_f + abs_strength_q2_c,
                  data = df_tc)
 summary(model_rq4)
 ```
@@ -507,25 +479,35 @@ summary(model_rq4)
 
 ## Visualization
 
-```{r rq4-fig, fig.height=6, fig.width=11, fig.cap="RQ4: Trust Change by Sponsor Gender, Absolute Endorsement Strength, and Outcome"}
-ggplot(df_tc, aes(x = abs_strength_q1, y = trust_change,
-                   color = outcome_f, fill = outcome_f)) +
-  geom_point(alpha = 0.4, size = 2) +
-  geom_smooth(method = "lm", se = TRUE, alpha = 0.15, size = 1.2) +
+```{r rq4-fig, fig.height=6, fig.width=11, fig.cap="RQ4: Trust Change by Sponsor Gender, Endorsement Strength, and Outcome"}
+rq4_stats <- df_tc %>%
+  group_by(endorser_gender_f, strength_f, outcome_f) %>%
+  summarise(
+    mean_change = mean(trust_change),
+    se = sd(trust_change) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(rq4_stats,
+       aes(x = outcome_f, y = mean_change, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
+                position = position_dodge(0.8), width = 0.25) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  facet_wrap(~ endorser_gender_f, nrow = 1) +
-  scale_color_manual(values = c("Failure" = FAILURE_RED, "Success" = SUCCESS_GRN),
-                     labels = c("D1 Failed", "D1 Succeeded")) +
-  scale_fill_manual(values = c("Failure" = FAILURE_RED, "Success" = SUCCESS_GRN),
-                    labels = c("D1 Failed", "D1 Succeeded")) +
-  scale_x_continuous(breaks = seq(0, 50, 10), limits = c(0, 50)) +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
+            position = position_dodge(0.8),
+            size = 3.5, fontface = "bold", color = "black") +
+  facet_wrap(~ strength_f, nrow = 1) +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(-55, 50), breaks = seq(-50, 50, 10)) +
   labs(
-    title = "RQ4: Is Trust Change More Sensitive to Strength x Outcome for Females?",
-    subtitle = paste0("N = ", nrow(df_tc), " | Compare slope divergence across panels"),
-    x = "Absolute Endorsement Strength (|Rating - 50|)",
-    y = "Trust Change (percentage points)",
-    color = "D1 Outcome",
-    fill = "D1 Outcome"
+    title = "RQ4: Trust Change by Gender x Outcome, Moderated by Endorsement Strength",
+    subtitle = paste0("Women rewarded MORE after weak endorsement success, LESS after strong | N = ", nrow(df_tc)),
+    x = "Decision 1 Outcome",
+    y = "Mean Change in Trust (%)",
+    fill = "Sponsor Gender"
   ) +
   theme_bw() +
   theme(
@@ -541,9 +523,9 @@ ggplot(df_tc, aes(x = abs_strength_q1, y = trust_change,
 **Observed pattern:**
 
 - The 3-way interaction is not significant (p = .877), indicating that the strength $\times$ outcome relationship does **not** meaningfully differ by sponsor gender
-- **All four slope estimates are negative** (ranging from -0.39 to -0.56), meaning that across genders and outcomes, higher endorsement strength is associated with *more negative* trust change
-- **Male sponsors** show a large outcome effect (21 pp Success vs. Failure boost, p = .109) but no strength $\times$ outcome interaction within males (p = .935)
-- **Female sponsors** show essentially no outcome effect (5 pp boost, p = .635) and no strength $\times$ outcome interaction within females (p = .719)
+- **Male sponsors**: Success produces a ~20 pp trust boost regardless of whether the endorsement was weak or strong. After failure, strong-endorsed males are penalized more than weak-endorsed males
+- **Female sponsors**: The success/failure distinction is essentially flat — all four bars hover near zero, with strong endorsements pulling slightly negative. Outcomes barely move trust change regardless of endorsement strength
+- **Strong endorsements penalize both genders**: Across all conditions, strong endorsements are associated with *more negative* trust change than weak endorsements, consistent with the significant abs_strength_q1_c effect in RQ1
 - The core gender asymmetry from RQ1 persists here — male sponsors' outcomes matter, female sponsors' outcomes do not — but this is not moderated by endorsement strength
 
 \newpage
@@ -555,7 +537,8 @@ Participants were asked to identify the sponsor's gender after the task (Q44). O
 ```{r manip-filter, include=FALSE}
 df_pass <- df %>% filter(q44_resp == endorser_gender_code)
 df_pass_tc <- df_pass %>% filter(!is.na(trust_change)) %>%
-  mutate(abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE))
+  mutate(abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE),
+         abs_strength_q2_c = abs_strength_q2 - mean(abs_strength_q2, na.rm = TRUE))
 ```
 
 ```{r manip-summary}
@@ -570,7 +553,7 @@ cat("  Excluded:", nrow(df) - nrow(df_pass),
 ## Appendix RQ1: Trust Change (Robustness)
 
 ```{r manip-rq1-model, results='markup'}
-model_rq1_pass <- lm(trust_change ~ endorser_gender_f * outcome_f + abs_strength_q1_c,
+model_rq1_pass <- lm(trust_change ~ endorser_gender_f * outcome_f + abs_strength_q1_c + abs_strength_q2_c,
                       data = df_pass_tc)
 summary(model_rq1_pass)
 ```
@@ -591,10 +574,10 @@ ggplot(rq1_pass_stats,
   geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
                 position = position_dodge(0.8), width = 0.25) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n)),
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
             position = position_dodge(0.8),
-            vjust = 0.5, size = 4, fontface = "bold",
-            color = ifelse(abs(rq1_pass_stats$mean_change) > 8, "white", "black")) +
+            size = 4, fontface = "bold", color = "black") +
   scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
   scale_y_continuous(limits = c(-35, 25), breaks = seq(-30, 20, 10)) +
   labs(
@@ -666,9 +649,50 @@ ggplot(rq3_pass_stats,
 ## Appendix RQ4: Trust Change 3-Way (Robustness)
 
 ```{r manip-rq4-model, results='markup'}
-model_rq4_pass <- lm(trust_change ~ endorser_gender_f * abs_strength_q1_c * outcome_f,
+model_rq4_pass <- lm(trust_change ~ endorser_gender_f * abs_strength_q1_c * outcome_f + abs_strength_q2_c,
                       data = df_pass_tc)
 summary(model_rq4_pass)
+```
+
+```{r manip-rq4-fig, fig.height=6, fig.width=11, fig.cap="Appendix RQ4: Trust Change 3-Way — Manipulation Check Passers Only"}
+rq4_pass_stats <- df_pass_tc %>%
+  group_by(endorser_gender_f, strength_f, outcome_f) %>%
+  summarise(
+    mean_change = mean(trust_change),
+    se = sd(trust_change) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(rq4_pass_stats,
+       aes(x = outcome_f, y = mean_change, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
+                position = position_dodge(0.8), width = 0.25) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
+            position = position_dodge(0.8),
+            size = 3.5, fontface = "bold", color = "black") +
+  facet_wrap(~ strength_f, nrow = 1) +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(-65, 55), breaks = seq(-60, 50, 10)) +
+  labs(
+    title = "Appendix RQ4: Trust Change 3-Way (Manipulation Check Passers)",
+    subtitle = paste0("N = ", nrow(df_pass_tc), " (manipulation check passers only)"),
+    x = "Decision 1 Outcome",
+    y = "Mean Change in Trust (%)",
+    fill = "Sponsor Gender"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    strip.text = element_text(size = 13, face = "bold"),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 13)
+  )
 ```
 
 \newpage
@@ -676,21 +700,26 @@ summary(model_rq4_pass)
 ## Appendix Summary: Full Sample vs. Manipulation Check Passers
 
 ```{r manip-comparison}
+# Use named coefficient indexing for robustness
+rq1_int   <- "endorser_gender_fWoman:outcome_fSuccess"
+rq3_int   <- "endorser_gender_fWoman:abs_strength_q1"
+rq4_int   <- "endorser_gender_fWoman:abs_strength_q1_c:outcome_fSuccess"
+
 comp <- data.frame(
   Test = c("RQ1: Gender x Outcome", "RQ3: Gender x Strength", "RQ4: 3-way"),
-  Full_b = c(round(coef(model_rq1)[5], 2),
-             round(coef(model_rq3)[4], 3),
-             round(coef(model_rq4)[8], 3)),
-  Full_p = c(round(summary(model_rq1)$coefficients[5, 4], 3),
-             round(summary(model_rq3)$coefficients[4, 4], 3),
-             round(summary(model_rq4)$coefficients[8, 4], 3)),
+  Full_b = c(round(coef(model_rq1)[rq1_int], 2),
+             round(coef(model_rq3)[rq3_int], 3),
+             round(coef(model_rq4)[rq4_int], 3)),
+  Full_p = c(round(summary(model_rq1)$coefficients[rq1_int, 4], 3),
+             round(summary(model_rq3)$coefficients[rq3_int, 4], 3),
+             round(summary(model_rq4)$coefficients[rq4_int, 4], 3)),
   Full_N = c(nrow(df_tc), nrow(df), nrow(df_tc)),
-  Pass_b = c(round(coef(model_rq1_pass)[5], 2),
-             round(coef(model_rq3_pass)[4], 3),
-             round(coef(model_rq4_pass)[8], 3)),
-  Pass_p = c(round(summary(model_rq1_pass)$coefficients[5, 4], 3),
-             round(summary(model_rq3_pass)$coefficients[4, 4], 3),
-             round(summary(model_rq4_pass)$coefficients[8, 4], 3)),
+  Pass_b = c(round(coef(model_rq1_pass)[rq1_int], 2),
+             round(coef(model_rq3_pass)[rq3_int], 3),
+             round(coef(model_rq4_pass)[rq4_int], 3)),
+  Pass_p = c(round(summary(model_rq1_pass)$coefficients[rq1_int, 4], 3),
+             round(summary(model_rq3_pass)$coefficients[rq3_int, 4], 3),
+             round(summary(model_rq4_pass)$coefficients[rq4_int, 4], 3)),
   Pass_N = c(nrow(df_pass_tc), nrow(df_pass), nrow(df_pass_tc))
 )
 

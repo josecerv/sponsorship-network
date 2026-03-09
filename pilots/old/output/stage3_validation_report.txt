@@ -1,0 +1,388 @@
+STAGE 3 EVALUATOR PILOT — VALIDATION REPORT
+============================================================
+Generated: 2026-02-19 17:30:01
+Survey: SV_6yEQEFjnFJ13klo
+
+─── QUICK SUMMARY ─────────────────────────────────
+  Complete responses:    399
+  Conditions covered:    8/8
+  Q1 stakes recorded:    399/399
+  Q2 stakes recorded:    399/399
+  Q1 stake: mean=52.7, SD=29.0
+  Q2 stake: mean=63.5, SD=29.9
+──────────────────────────────────────────────────
+============================================================
+
+
+============================================================
+1. RESPONSE OVERVIEW
+============================================================
+  Total rows in export:   1159
+  Filter date:            2026-02-19
+  Preview responses:      5
+  Incomplete responses:   17
+  Other dates excluded:   271
+  No embedded data (JS):  467
+  Usable (valid):         399
+  Available columns:      75
+
+============================================================
+2. EMBEDDED DATA COMPLETENESS
+============================================================
+  Fields with missing data (out of 399 responses):
+    [WARNING] q1_rt (rt_ms_stage3_q1): 2/399 missing (1%)
+    [WARNING] q2_rt (rt_ms_stage3_q2): 2/399 missing (1%)
+    [WARNING] outcome_rt (rt_ms_stage3_outcome): 2/399 missing (1%)
+
+============================================================
+3. CONDITION BALANCE (2x2x2 factorial)
+============================================================
+  Total responses: 399
+  Unique conditions seen: 8
+
+  Condition distribution:
+    M_correct_strong                 57  #########################################################
+    M_correct_weak                   57  #########################################################
+    M_incorrect_strong               43  ###########################################
+    M_incorrect_weak                 56  ########################################################
+    W_correct_strong                 65  #################################################################
+    W_correct_weak                   35  ###################################
+    W_incorrect_strong               39  #######################################
+    W_incorrect_weak                 47  ###############################################
+
+  Factor-level totals:
+    Endorser gender:   Man=213  Woman=186
+    Correctness:       Correct=214  Incorrect=185
+    Strength:          Strong=204  Weak=195
+
+============================================================
+4. STAKE DECISION VARIANCE
+============================================================
+
+  --- Q1 Stake (stake_percent_q1) ---
+  N valid:  399
+  Range:    0.0 – 100.0
+  Mean:     52.7  (SD=29.0)
+  Median:   50.0  (IQR: 25.0 – 75.0)
+  Distribution:
+       0-20:  61  #############################################################
+      21-40:  61  #############################################################
+      41-60: 124  ############################################################################################################################
+      61-80:  91  ###########################################################################################
+     81-100:  62  ##############################################################
+
+  --- Q2 Stake (stake_percent_q2) ---
+  N valid:  399
+  Range:    0.0 – 100.0
+  Mean:     63.5  (SD=29.9)
+  Median:   75.0  (IQR: 50.0 – 89.0)
+  Distribution:
+       0-20:  47  ###############################################
+      21-40:  48  ################################################
+      41-60:  69  #####################################################################
+      61-80: 117  #####################################################################################################################
+     81-100: 118  ######################################################################################################################
+
+  --- Stake by condition (Q1) ---
+    M_correct_strong                n=57  mean= 65.3  SD= 25.2
+    M_correct_weak                  n=57  mean= 37.8  SD= 23.9
+    M_incorrect_strong              n=43  mean= 72.8  SD= 24.7
+    M_incorrect_weak                n=56  mean= 34.0  SD= 23.9
+    W_correct_strong                n=65  mean= 69.0  SD= 26.0
+    W_correct_weak                  n=35  mean= 38.4  SD= 21.7
+    W_incorrect_strong              n=39  mean= 65.2  SD= 26.0
+    W_incorrect_weak                n=47  mean= 37.1  SD= 23.5
+
+============================================================
+5. RESPONSE TIMES
+============================================================
+
+  --- Q1 RT (rt_ms_stage3_q1) ---
+  N valid:  397
+  Range:    5.4s – 658.0s
+  Mean:     43.5s  (SD=45.8s)
+  Median:   33.9s
+  [INFO] 2 responses > 5 min (possible tab-aways)
+
+  --- Q2 RT (rt_ms_stage3_q2) ---
+  N valid:  397
+  Range:    2.4s – 103.1s
+  Mean:     18.7s  (SD=15.2s)
+  Median:   14.2s
+  [WARNING] 1 responses < 3s (possible speeders)
+
+  --- Outcome RT (rt_ms_stage3_outcome) ---
+  N valid:  397
+  Range:    1.9s – 99.9s
+  Mean:     11.6s  (SD=8.8s)
+  Median:   9.0s
+  [WARNING] 7 responses < 3s (possible speeders)
+
+============================================================
+6. ENDORSER USAGE
+============================================================
+  Unique endorsers shown: 64
+  Endorser gender distribution: {'Man': 213, 'Woman': 186}
+
+  Endorser usage frequency:
+    663e26ccdbc470527165388b: 13
+    5d537c0cecc84200153075e9: 12
+    66b01097e95b0626c2cd7b5c: 11
+    5e5731e3e1e8b90e25c1f3a2: 11
+    62877d5f6a054e53313ac916: 10
+    66bffd8c97a80ac91e1087e0: 10
+    55d234b45bc5bc0005d9039d: 10
+    67215f2922159d42abf932a4: 10
+    6632e71b65934c5810fb2eff: 9
+    59e7477e3e4b5a00016aa4d2: 9
+    66e9cc5fb04f5ba6d8b5a3f1: 9
+    5e05ab290db892fcd8036b1a: 9
+    5c005838232b6c0001221acf: 9
+    664439645a9a29be43d5bf5a: 9
+    641385c88f29eb3264283818: 8
+    6675f3ac3a5d0633257190c4: 8
+    62d59a066ee263bb659aa445: 8
+    6679dc943f855ba978447c25: 8
+    66956649d7179281d46fa6f2: 8
+    6473bd2d95a488b826bc24c4: 8
+    67aa52dcb66d138fca70a211: 8
+    66be78ef3ca75af1251ce936: 8
+    63d80b500adef5b476e289a4: 7
+    63d414f95753ac660a9e09e1: 6
+    5bf4afe0b8e9f800014c9c0b: 6
+    570521cfde5095001018a0c8: 6
+    5f4ee7ff2c5da213f015a27e: 6
+    591d369e88bbb500013a8517: 6
+    65cb86a7e667e637599a3af3: 6
+    5b81e0a72ce68d0001fa68d5: 6
+    5f5967d6e280e61b2db8e55c: 6
+    63ecff07b619306f41db42fa: 6
+    67a95d468d14bd6324b4bbba: 5
+    63d3f99eac52371a49e65825: 5
+    633c74ad6178784ed5b52104: 5
+    6745f39f437c441b19285a1a: 5
+    5f285dc5b09b3715fa20a14c: 5
+    65fd19896d58d64c0d8cbc3c: 5
+    63ed04d2ce3b27bda2fbbb9c: 5
+    62b628e4351d179f1ff6cc59: 5
+    622a11c552b2b35bab72a39c: 5
+    65e8ff784cc1b2fc71bc5368: 5
+    61188057fe5a395476806c12: 5
+    62029a55ef1cb18a1337c61a: 5
+    6643d22289210a4edf21e84d: 5
+    671498899f67df85f33ea053: 5
+    R_6LuSAqe1z1kqjId: 5
+    666b5817eadabfbefc40fe1b: 5
+    6398db762e009c7af9e1da88: 4
+    5e9f3f09ccc75a0c345e4845: 4
+    65714a2185b7c4c7ee00ddcd: 4
+    5eac686d82cc012af1e953c7: 4
+    6702c3ee33eed6369eb34c8f: 4
+    6598942c3d07928cc188ffdb: 4
+    5f5452df72345118f58d187b: 4
+    63d5b810f3dbbd11e7e65870: 4
+    66e7853b4e311a12f93b5411: 4
+    66db9db4324609f1a7231f49: 3
+    65a7027c88eae2b9a68ae596: 3
+    61bb392e40db417c1a138dcb: 3
+    6446b4a6eb2ba64c1505307d: 3
+    655f96e689f922fe983fed35: 2
+    66ccca31c45aad520357f3fb: 2
+    652ecb92078fe073ab29b920: 1
+
+============================================================
+7. CANDIDATE PAIR USAGE
+============================================================
+
+  --- Q1 pairs (stage3_q1_pair_id) ---
+  Unique pairs: 9
+    dominant_woman_wins                       85
+    dominant_man_wins                         26
+    misleading_woman_looks_better             72
+    misleading_man_looks_better               17
+    close_woman_wins                          27
+    identical_woman_woman                     126
+    unknown_woman_gk                          4
+    unknown_man_word                          13
+    split_unknowns                            29
+    man_vs_man                                0
+
+  --- Q2 pairs (stage3_q2_pair_id) ---
+  Unique pairs: 10
+    dominant_woman_wins                       52
+    dominant_man_wins                         72
+    misleading_woman_looks_better             22
+    misleading_man_looks_better               80
+    close_woman_wins                          14
+    identical_woman_woman                     3
+    unknown_woman_gk                          50
+    unknown_man_word                          32
+    split_unknowns                            31
+    man_vs_man                                43
+
+============================================================
+8. ENDORSER SLIDER VALUES
+============================================================
+
+  --- Q1 endorser slider (endorser_slider_value_q1) ---
+  N valid: 399
+  Range: 0.0 – 100.0
+  Mean: 37.1  SD=33.4
+  Strength (abs distance from 50): mean=26.1, range=1.0–50.0
+
+  --- Q2 endorser slider (endorser_slider_value_q2) ---
+  N valid: 399
+  Range: 0.0 – 99.0
+  Mean: 28.8  SD=35.3
+  Strength (abs distance from 50): mean=40.1, range=11.0–50.0
+
+============================================================
+9. PARTICIPANT DEMOGRAPHICS
+============================================================
+
+  gender (field: gender):
+    1: 209
+    2: 182
+    3: 8
+
+  age (field: age):
+    34: 18
+    33: 12
+    55: 12
+    45: 12
+    46: 11
+    28: 10
+    39: 10
+    26: 10
+    35: 10
+    42: 10
+    41: 10
+    29: 9
+    58: 9
+    31: 9
+    51: 9
+    36: 9
+    52: 9
+    30: 9
+    60: 8
+    49: 8
+    40: 8
+    32: 8
+    68: 8
+    43: 7
+    71: 7
+    54: 7
+    53: 7
+    61: 7
+    57: 7
+    38: 7
+    67: 7
+    47: 6
+    62: 6
+    44: 6
+    48: 6
+    25: 6
+    70: 6
+    50: 6
+    23: 5
+    22: 5
+    74: 5
+    64: 5
+    69: 4
+    37: 4
+    56: 4
+    63: 4
+    59: 4
+    27: 4
+    76: 3
+    24: 3
+    72: 3
+    73: 3
+    79: 2
+    66: 2
+    75: 2
+    21: 2
+    78: 2
+    65: 2
+    77: 2
+    81: 1
+    19: 1
+    84: 1
+
+  race (field: race):
+    5: 323
+    3: 34
+    2: 28
+    4: 11
+    1: 3
+
+============================================================
+10. INDIVIDUAL RESPONSE FLAGS
+============================================================
+  66 response(s) flagged:
+    R_5BaH2xZ3AGkiXjN: identical stakes Q1=Q2=100
+    R_7U3FD7uESS4XuWZ: identical stakes Q1=Q2=100
+    R_3PbjsNNZdxM3RyU: identical stakes Q1=Q2=25
+    R_6kBxfMxPIkHaHCc: identical stakes Q1=Q2=100
+    R_3uODtVOH644t125: identical stakes Q1=Q2=100
+    R_7WPx5EgyqXNTnTC: identical stakes Q1=Q2=75
+    R_6NBeVAefU8GMVgJ: identical stakes Q1=Q2=50
+    R_3bHMBmjm3G370lh: identical stakes Q1=Q2=100
+    R_1j2Mt30StKqaccy: identical stakes Q1=Q2=100
+    R_6wTq6i8ivCkRXFv: identical stakes Q1=Q2=50
+    R_1dhBF7QRTWq1gap: identical stakes Q1=Q2=0
+    R_3hhvdnge9PoTYgp: identical stakes Q1=Q2=75
+    R_3uxmDuIv0oeA0kI: identical stakes Q1=Q2=100
+    R_6gUBfdRj3uw5hsq: identical stakes Q1=Q2=0
+    R_1TI7Hl9dhqnzKcp: identical stakes Q1=Q2=75
+    R_78UKlsg0Gmb1Ylg: identical stakes Q1=Q2=75
+    R_1fN7ZFVIaQNeEtn: identical stakes Q1=Q2=0
+    R_3qVCcvtuBJlyNsB: identical stakes Q1=Q2=100
+    R_3z0mTm4nCYewdZT: identical stakes Q1=Q2=50
+    R_5Yhdhd741qCLe1P: identical stakes Q1=Q2=100
+    R_3HjG95YjabqcLKg: identical stakes Q1=Q2=25
+    R_6fdg79JVF6nQoaI: identical stakes Q1=Q2=0
+    R_3lY4T0g1Y7JOasO: identical stakes Q1=Q2=50
+    R_1hL65Vkrgs7qniV: identical stakes Q1=Q2=50
+    R_3cGuezdDu9vGbIZ: identical stakes Q1=Q2=75
+    R_35uzOLYCIkriEGP: identical stakes Q1=Q2=100
+    R_7GDlNJAmeLAHP5l: identical stakes Q1=Q2=0
+    R_6xRyPZGCXNG7Yu0: identical stakes Q1=Q2=100
+    R_6axPpfbEYTJOpQR: identical stakes Q1=Q2=75
+    R_7fdcgEysLwyYVik: identical stakes Q1=Q2=100
+    R_5pGbucwGCIkzbv3: identical stakes Q1=Q2=100
+    R_12KEqIYaQkIGx4i: identical stakes Q1=Q2=10
+    R_6pyP6OgwIois1V9: identical stakes Q1=Q2=100
+    R_6bUYcebBAOWrDOW: identical stakes Q1=Q2=50
+    R_7hNhafM1lMz2oRd: identical stakes Q1=Q2=100
+    R_3DMG2aTLTWc6DXr: identical stakes Q1=Q2=100
+    R_6esoMZxm0BvQGUG: identical stakes Q1=Q2=25
+    R_6NKTrlTnKNL5XVL: identical stakes Q1=Q2=100
+    R_7mDDbX8YMhFAgBg: Q2 speed (2.4s)
+    R_7lGFEL7Hyc2tfkt: identical stakes Q1=Q2=75
+    R_1tLSY4FZvurbd29: identical stakes Q1=Q2=0
+    R_31A3PxPPoGDjAIl: identical stakes Q1=Q2=75
+    R_1k06Jiy2Uh8zWmr: identical stakes Q1=Q2=100
+    R_63MChbSY9U5hsNX: identical stakes Q1=Q2=50
+    R_7OPb0kuZBWvfEJg: identical stakes Q1=Q2=75
+    R_5ymeXyZ1sfuKEaM: identical stakes Q1=Q2=55
+    R_6IctxDMqoO2AzwM: identical stakes Q1=Q2=90
+    R_5Dx50CzHusJk4qn: identical stakes Q1=Q2=100
+    R_1FRp1NM11pHnZc1: identical stakes Q1=Q2=75
+    R_5V78GBL9dZRgn17: identical stakes Q1=Q2=50
+    R_1neHkrQobWd7Qjf: identical stakes Q1=Q2=90
+    R_5hSApacaKURjmD8: identical stakes Q1=Q2=75
+    R_7tyYmNv45pQp5sy: identical stakes Q1=Q2=100
+    R_6GkO9vnoVUMtwIh: identical stakes Q1=Q2=75
+    R_6Hkr9ItBvhhMgRj: identical stakes Q1=Q2=75
+    R_6jZIbHDOc4Iz2HC: identical stakes Q1=Q2=37
+    R_3y0RPoplNFn54HL: identical stakes Q1=Q2=100
+    R_3wKMl5VBzSG4tiG: identical stakes Q1=Q2=40
+    R_1FPs1fRImqjUXA9: identical stakes Q1=Q2=50
+    R_6BWoBzdk3y7bISp: identical stakes Q1=Q2=100
+    R_5spkUmf9b6BqZhx: identical stakes Q1=Q2=50
+    R_74Ab9qJq9ee9eJ6: identical stakes Q1=Q2=100
+    R_70wMyyMQbZxOMt7: identical stakes Q1=Q2=0
+    R_5rlaMvRTOqvkWi9: identical stakes Q1=Q2=100
+    R_1dgwEpLD9cHm03N: identical stakes Q1=Q2=75
+    R_3npawdFVRcyDBhU: identical stakes Q1=Q2=0

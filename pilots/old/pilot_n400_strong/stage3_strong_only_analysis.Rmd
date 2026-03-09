@@ -1,0 +1,617 @@
+---
+title: "Stage 3 Results — Strong-Only Pilot (N=400)"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document:
+    toc: no
+    fig_caption: true
+    latex_engine: pdflatex
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: flatly
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 10,
+  fig.height = 6
+)
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+
+is_pdf <- knitr::is_latex_output()
+if (!is_pdf) library(kableExtra)
+
+styled_kable <- function(data, ...) {
+  k <- kable(data, booktabs = TRUE, ...)
+  if (!is_pdf) k <- kable_styling(k, bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+  k
+}
+
+PENN_BLUE   <- "#011F5B"
+PENN_RED    <- "#990000"
+SUCCESS_GRN <- "#2E7D32"
+FAILURE_RED <- "#C62828"
+
+# Strong-only Prolific study
+TARGET_STUDY <- "699c9e56d324339355fee87e"
+```
+
+```{r load-data, include=FALSE}
+raw <- read.csv("../output/stage3_strong_only_data.csv", stringsAsFactors = FALSE)
+raw <- raw[-c(1, 2), ]
+
+numeric_cols <- c("Progress", "Duration..in.seconds.", "Finished",
+                  "endorser_slider_value_q1", "endorser_slider_value_q2",
+                  "stake_percent_q1", "stake_percent_q2",
+                  "rt_ms_stage3_q1", "rt_ms_stage3_q2", "rt_ms_stage3_outcome",
+                  "stage3_q1_is_correct", "stage3_q1_actual_bonus",
+                  "age", "gender", "race")
+for (col in numeric_cols) {
+  if (col %in% names(raw)) raw[[col]] <- suppressWarnings(as.numeric(raw[[col]]))
+}
+
+raw$StartDate <- as.POSIXct(raw$StartDate, format = "%Y-%m-%d %H:%M:%S")
+raw$date <- as.Date(raw$StartDate)
+
+# Exclusion cascade
+d0 <- raw
+d1 <- d0 %>% filter(Status != "1")
+d2 <- d1 %>% filter(Finished == 1)
+d3 <- d2 %>% filter(!is.na(PROLIFIC_PID) & trimws(PROLIFIC_PID) != "")
+d3b <- d3 %>% filter(STUDY_ID == TARGET_STUDY)
+d4 <- d3b %>% filter(Q42 == "2")
+d5 <- d4 %>% filter(!is.na(assigned_condition) & trimws(assigned_condition) != "")
+d6 <- d5 %>% filter(!is.na(stake_percent_q1))
+df <- d6
+
+# Derive variables
+df <- df %>%
+  mutate(
+    endorser_gender_code = ifelse(grepl("^M_", assigned_condition), "Man", "Woman"),
+    endorser_correct     = ifelse(grepl("_correct_", assigned_condition), 1, 0),
+    endorser_gender_f = factor(endorser_gender_code, levels = c("Man", "Woman")),
+    outcome_f         = factor(ifelse(stage3_q1_is_correct == 1, "Success", "Failure"),
+                               levels = c("Failure", "Success")),
+    trust_change = stake_percent_q2 - stake_percent_q1,
+    duration_min = Duration..in.seconds. / 60
+  )
+
+df <- df %>%
+  mutate(
+    abs_strength_q1 = abs(endorser_slider_value_q1 - 50),
+    abs_strength_q2 = abs(endorser_slider_value_q2 - 50)
+  )
+
+df_tc <- df %>%
+  filter(!is.na(trust_change), !is.na(stake_percent_q2)) %>%
+  mutate(
+    abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE),
+    abs_strength_q2_c = abs_strength_q2 - mean(abs_strength_q2, na.rm = TRUE),
+    congruent_update = ifelse(
+      (outcome_f == "Success" & trust_change > 0) |
+      (outcome_f == "Failure" & trust_change < 0),
+      1, 0
+    )
+  )
+
+# Manipulation check subsets
+df$q44_resp <- case_when(df$Q44 == "1" ~ "Man", df$Q44 == "2" ~ "Woman", TRUE ~ NA_character_)
+df_pass <- df %>% filter(q44_resp == endorser_gender_code)
+df_pass_tc <- df_pass %>%
+  filter(!is.na(trust_change), !is.na(stake_percent_q2)) %>%
+  mutate(
+    abs_strength_q1_c = abs_strength_q1 - mean(abs_strength_q1, na.rm = TRUE),
+    abs_strength_q2_c = abs_strength_q2 - mean(abs_strength_q2, na.rm = TRUE),
+    congruent_update = ifelse(
+      (outcome_f == "Success" & trust_change > 0) |
+      (outcome_f == "Failure" & trust_change < 0),
+      1, 0
+    )
+  )
+
+# Helper functions
+safe_coef <- function(model, term) {
+  cf <- coef(model)
+  if (term %in% names(cf)) round(cf[term], 3) else NA
+}
+safe_p <- function(model, term) {
+  s <- summary(model)$coefficients
+  if (term %in% rownames(s)) round(s[term, 4], 3) else NA
+}
+```
+
+# Data Overview
+
+## Data Freshness
+
+```{r data-freshness}
+cat("Data exported:", format(file.info("../output/stage3_strong_only_data.csv")$mtime, "%Y-%m-%d %H:%M"), "\n")
+cat("Analysis run:", format(Sys.time(), "%Y-%m-%d %H:%M"), "\n")
+cat("Total raw rows:", nrow(d0), "\n")
+```
+
+## Exclusion Cascade
+
+```{r exclusion-cascade}
+cascade <- data.frame(
+  Step = c("Raw responses", "Not preview (Status != 1)", "Finished",
+           "Has Prolific PID", "Target study",
+           "Comprehension check (Q42 = 2)",
+           "Has assigned condition", "Has Q1 stake"),
+  N = c(nrow(d0), nrow(d1), nrow(d2), nrow(d3), nrow(d3b), nrow(d4), nrow(d5), nrow(d6)),
+  Dropped = c(NA, nrow(d0) - nrow(d1), nrow(d1) - nrow(d2), nrow(d2) - nrow(d3),
+              nrow(d3) - nrow(d3b), nrow(d3b) - nrow(d4), nrow(d4) - nrow(d5),
+              nrow(d5) - nrow(d6))
+)
+styled_kable(cascade, col.names = c("Filter Step", "N Remaining", "Dropped"), row.names = FALSE)
+```
+
+```{r comprehension-flag}
+comp_rate <- round(nrow(d4) / nrow(d3b) * 100, 1)
+cat("Comprehension check pass rate:", comp_rate, "%\n")
+if (comp_rate < 60) {
+  cat("WARNING: Pass rate is notably lower than the original N=400 study (87.3%).\n")
+  cat("This may indicate participant pool quality differences or survey variation.\n")
+}
+```
+
+## Sample Summary
+
+```{r sample-summary}
+cat("Prolific Study ID:", TARGET_STUDY, "\n")
+cat("Survey: SV_6oqgEjZV4MhmbiK (strong-only)\n")
+cat("Date range:", format(min(df$StartDate, na.rm = TRUE), "%b %d"),
+    "to", format(max(df$StartDate, na.rm = TRUE), "%b %d, %Y"), "\n")
+cat("Usable N:", nrow(df), "\n")
+cat("Has Trust Change:", sum(!is.na(df$trust_change)), "\n")
+cat("Mean duration:", round(mean(df$duration_min, na.rm = TRUE), 1), "min\n")
+cat("Mean Q1 Stake:", round(mean(df$stake_percent_q1), 1), "\n")
+cat("Mean Q2 Stake:", round(mean(df$stake_percent_q2, na.rm = TRUE), 1), "\n")
+cat("Mean Trust Change:", round(mean(df$trust_change, na.rm = TRUE), 1), "\n")
+```
+
+## Condition Balance
+
+```{r condition-balance}
+cond_tab <- df %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(N = n(), .groups = "drop") %>%
+  arrange(endorser_gender_f, outcome_f)
+
+styled_kable(cond_tab,
+             col.names = c("Sponsor Gender", "Outcome", "N"),
+             row.names = FALSE)
+```
+
+## Design Note
+
+This is a **strong-only** replication of the strong endorsement condition from the original N=400 pilot (Feb 19 study). The design is a **2 $\times$ 2 between-subjects** factorial:
+
+- **Endorser Gender**: Man vs. Woman
+- **Outcome**: Failure (incorrect) vs. Success (correct)
+
+All endorsements are strong ($>70$ on 0--100 slider). The primary hypothesis (from the original N=400 analysis) is that women receive a **smaller success boost** than men in the strong condition --- a negative Gender $\times$ Outcome interaction.
+
+**Expected effect**: In the original N=400 study (strong condition only, about 50/cell), the Gender $\times$ Outcome interaction was $b = -9.0$, $p = .226$. With about 100/cell here, we expected $p \approx .085$.
+
+\newpage
+
+# Primary Analysis: Trust Change by Sponsor Gender $\times$ Outcome
+
+## Cell Means
+
+```{r cell-means}
+cell_means <- df_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    N = n(),
+    Mean_TC = round(mean(trust_change), 1),
+    SD = round(sd(trust_change), 1),
+    SE = round(sd(trust_change) / sqrt(n()), 1),
+    .groups = "drop"
+  ) %>%
+  arrange(endorser_gender_f, outcome_f)
+
+styled_kable(cell_means,
+             col.names = c("Sponsor Gender", "Outcome", "N", "Mean Trust Change", "SD", "SE"),
+             row.names = FALSE)
+```
+
+## Success Boost
+
+```{r success-boost}
+boost <- df_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(mean_tc = mean(trust_change), .groups = "drop") %>%
+  pivot_wider(names_from = outcome_f, values_from = mean_tc) %>%
+  mutate(Success_Boost = round(Success - Failure, 1))
+
+styled_kable(boost %>% select(endorser_gender_f, Failure, Success, Success_Boost) %>%
+               mutate(Failure = round(Failure, 1), Success = round(Success, 1)),
+             col.names = c("Sponsor Gender", "Failure Mean", "Success Mean", "Success Boost"),
+             row.names = FALSE)
+```
+
+## Model
+
+$$
+\text{trust\_change}_{i} = \beta_0 + \beta_1 \texttt{Woman}_{i} + \beta_2 \texttt{Success}_{i} + \beta_3 (\texttt{Woman}_{i} \times \texttt{Success}_{i}) + \epsilon_{i}
+$$
+
+```{r model-vars}
+model_vars <- data.frame(
+  Coefficient = c("Intercept", "Woman", "Success", "Woman x Success"),
+  Meaning = c("Mean trust change: male sponsors after failure",
+              "Gender difference in failure condition",
+              "Success boost for male sponsors",
+              "HQ1 test: negative = women's success boost is smaller")
+)
+styled_kable(model_vars, col.names = c("Term", "Interpretation"), row.names = FALSE)
+```
+
+```{r primary-model, results='markup'}
+model_primary <- lm(trust_change ~ endorser_gender_f * outcome_f, data = df_tc)
+summary(model_primary)
+```
+
+```{r primary-summary}
+int_term <- "endorser_gender_fWoman:outcome_fSuccess"
+b_int <- round(coef(model_primary)[int_term], 1)
+p_int <- round(summary(model_primary)$coefficients[int_term, 4], 3)
+b_success <- round(coef(model_primary)["outcome_fSuccess"], 1)
+b_woman_success <- round(b_success + coef(model_primary)[int_term], 1)
+
+cat("--- Summary ---\n")
+cat("Man success boost:", b_success, "\n")
+cat("Woman success boost:", b_woman_success, "\n")
+cat("Gender x Outcome interaction: b =", b_int, ", p =", p_int, "\n")
+cat("Original N=400 strong condition: b = -9.0, p = .226 (~50/cell)\n")
+```
+
+\newpage
+
+## Visualization
+
+```{r primary-fig, fig.height=6, fig.width=9, fig.cap="Trust Change by Sponsor Gender and Outcome (Strong Endorsements Only)"}
+primary_stats <- df_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    mean_change = mean(trust_change),
+    se = sd(trust_change) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(primary_stats,
+       aes(x = outcome_f, y = mean_change, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
+                position = position_dodge(0.8), width = 0.25) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
+            position = position_dodge(0.8),
+            size = 4, fontface = "bold", color = "black") +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(-25, 20), breaks = seq(-25, 20, 5)) +
+  labs(
+    title = "Trust Change by Sponsor Gender and Outcome (Strong Only)",
+    subtitle = paste0("N = ", nrow(df_tc), " | All endorsements strong"),
+    x = "Decision 1 Outcome",
+    y = "Mean Change in Trust (%)",
+    fill = "Sponsor Gender"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 13)
+  )
+```
+
+\newpage
+
+# Binary DV Robustness: Outcome-Congruent Update
+
+```{r binary-model, results='markup'}
+model_binary <- glm(congruent_update ~ endorser_gender_f * outcome_f +
+                      abs_strength_q1_c + abs_strength_q2_c,
+                    family = binomial(link = "logit"),
+                    data = df_tc)
+summary(model_binary)
+```
+
+```{r binary-fig, fig.height=5, fig.width=9, fig.cap="Binary DV: Outcome-congruent update rates"}
+bin_stats <- df_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    rate = mean(congruent_update),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(bin_stats,
+       aes(x = outcome_f, y = rate, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_text(aes(label = sprintf("%.1f%%\n(n=%d)", 100 * rate, n)),
+            position = position_dodge(0.8),
+            vjust = -0.5, size = 3.5, fontface = "bold") +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1),
+                     labels = function(x) paste0(round(100 * x), "%")) +
+  labs(
+    title = "Binary Robustness: Outcome-Congruent Trust Update",
+    subtitle = paste0("1 = update direction matches outcome | N = ", nrow(df_tc)),
+    x = "Decision 1 Outcome",
+    y = "Congruent Update Rate",
+    fill = "Sponsor Gender"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 13)
+  )
+```
+
+\newpage
+
+# Initial Trust (Decision 1) by Sponsor Gender
+
+Since all endorsements are strong, we can test whether evaluators anchor differently by gender even before learning the outcome.
+
+```{r q1-trust}
+q1_stats <- df %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    N = n(),
+    Mean_Q1 = round(mean(stake_percent_q1), 1),
+    SD = round(sd(stake_percent_q1), 1),
+    .groups = "drop"
+  )
+
+styled_kable(q1_stats,
+             col.names = c("Sponsor Gender", "Outcome", "N", "Mean Q1 Stake", "SD"),
+             row.names = FALSE)
+```
+
+```{r q1-model, results='markup'}
+model_q1 <- lm(stake_percent_q1 ~ endorser_gender_f, data = df)
+summary(model_q1)
+```
+
+```{r q1-fig, fig.height=5, fig.width=7, fig.cap="Initial Trust by Sponsor Gender (all strong endorsements)"}
+q1_gender <- df %>%
+  group_by(endorser_gender_f) %>%
+  summarise(
+    mean_trust = mean(stake_percent_q1),
+    se = sd(stake_percent_q1) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(q1_gender,
+       aes(x = endorser_gender_f, y = mean_trust, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_errorbar(aes(ymin = mean_trust - se, ymax = mean_trust + se), width = 0.2) +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_trust, n)),
+            vjust = 1.5, size = 5, color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 10)) +
+  labs(
+    title = "Initial Trust by Sponsor Gender (All Strong Endorsements)",
+    subtitle = paste0("N = ", nrow(df)),
+    x = "Sponsor Gender",
+    y = "Initial Trust (%)",
+    fill = "Sponsor Gender"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 13)
+  )
+```
+
+\newpage
+
+# Appendix: Manipulation Check Passers
+
+Participants were asked to identify the sponsor's gender after the task (Q44). Overall accuracy was `r round(mean(df$q44_resp == df$endorser_gender_code, na.rm = TRUE) * 100, 1)`%. Below we re-run the primary analysis excluding those who failed or did not respond.
+
+```{r manip-summary}
+cat("Manipulation check pass: N =", nrow(df_pass), "of", nrow(df), "\n")
+cat("  Man:", sum(df_pass$endorser_gender_code == "Man"),
+    "| Woman:", sum(df_pass$endorser_gender_code == "Woman"), "\n")
+cat("  Excluded:", nrow(df) - nrow(df_pass),
+    "(Man:", sum(df$endorser_gender_code == "Man") - sum(df_pass$endorser_gender_code == "Man"),
+    "| Woman:", sum(df$endorser_gender_code == "Woman") - sum(df_pass$endorser_gender_code == "Woman"), ")\n")
+
+cat("\nQ44 non-response:", sum(is.na(df$q44_resp)), "of", nrow(df), "\n")
+```
+
+## Cell Means (Manipulation Check Passers)
+
+```{r manip-cell-means}
+cell_means_pass <- df_pass_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    N = n(),
+    Mean_TC = round(mean(trust_change), 1),
+    SD = round(sd(trust_change), 1),
+    SE = round(sd(trust_change) / sqrt(n()), 1),
+    .groups = "drop"
+  ) %>%
+  arrange(endorser_gender_f, outcome_f)
+
+styled_kable(cell_means_pass,
+             col.names = c("Sponsor Gender", "Outcome", "N", "Mean Trust Change", "SD", "SE"),
+             row.names = FALSE)
+```
+
+## Success Boost (Manipulation Check Passers)
+
+```{r manip-success-boost}
+boost_pass <- df_pass_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(mean_tc = mean(trust_change), .groups = "drop") %>%
+  pivot_wider(names_from = outcome_f, values_from = mean_tc) %>%
+  mutate(Success_Boost = round(Success - Failure, 1))
+
+styled_kable(boost_pass %>% select(endorser_gender_f, Failure, Success, Success_Boost) %>%
+               mutate(Failure = round(Failure, 1), Success = round(Success, 1)),
+             col.names = c("Sponsor Gender", "Failure Mean", "Success Mean", "Success Boost"),
+             row.names = FALSE)
+```
+
+## Model (Manipulation Check Passers)
+
+```{r manip-model, results='markup'}
+model_pass <- lm(trust_change ~ endorser_gender_f * outcome_f, data = df_pass_tc)
+summary(model_pass)
+```
+
+```{r manip-summary-stats}
+b_int_p <- round(coef(model_pass)[int_term], 1)
+p_int_p <- round(summary(model_pass)$coefficients[int_term, 4], 3)
+b_success_p <- round(coef(model_pass)["outcome_fSuccess"], 1)
+b_woman_success_p <- round(b_success_p + coef(model_pass)[int_term], 1)
+
+cat("--- Manip Passers Summary ---\n")
+cat("Man success boost:", b_success_p, "\n")
+cat("Woman success boost:", b_woman_success_p, "\n")
+cat("Gender x Outcome interaction: b =", b_int_p, ", p =", p_int_p, "\n")
+```
+
+## Visualization (Manipulation Check Passers)
+
+```{r manip-fig, fig.height=6, fig.width=9, fig.cap="Trust Change --- Manipulation Check Passers Only"}
+pass_stats <- df_pass_tc %>%
+  group_by(endorser_gender_f, outcome_f) %>%
+  summarise(
+    mean_change = mean(trust_change),
+    se = sd(trust_change) / sqrt(n()),
+    n = n(),
+    .groups = "drop"
+  )
+
+ggplot(pass_stats,
+       aes(x = outcome_f, y = mean_change, fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = mean_change - se, ymax = mean_change + se),
+                position = position_dodge(0.8), width = 0.25) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", mean_change, n),
+                vjust = ifelse(mean_change >= 0, -0.5, 1.5)),
+            position = position_dodge(0.8),
+            size = 4, fontface = "bold", color = "black") +
+  scale_fill_manual(values = c("Man" = PENN_BLUE, "Woman" = PENN_RED)) +
+  scale_y_continuous(limits = c(-25, 20), breaks = seq(-25, 20, 5)) +
+  labs(
+    title = "Trust Change (Manipulation Check Passers Only)",
+    subtitle = paste0("N = ", nrow(df_pass_tc), " | Strong endorsements only"),
+    x = "Decision 1 Outcome",
+    y = "Mean Change in Trust (%)",
+    fill = "Sponsor Gender"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 13)
+  )
+```
+
+## Binary DV (Manipulation Check Passers)
+
+```{r manip-binary-model, results='markup'}
+model_binary_pass <- glm(congruent_update ~ endorser_gender_f * outcome_f +
+                           abs_strength_q1_c + abs_strength_q2_c,
+                         family = binomial(link = "logit"),
+                         data = df_pass_tc)
+summary(model_binary_pass)
+```
+
+\newpage
+
+# Comparison: Strong-Only Pilot vs. Original N=400 Strong Condition
+
+```{r comparison-table}
+# This table compares the current strong-only results with the
+# strong condition subset from the original N=400 study
+comp <- data.frame(
+  Metric = c("N (usable)", "N (trust change)",
+             "Man: Failure mean", "Man: Success mean", "Man: Success boost",
+             "Woman: Failure mean", "Woman: Success mean", "Woman: Success boost",
+             "Gender x Outcome b", "Gender x Outcome p"),
+  Original_Strong = c("~190 (strong only)", "~190",
+                       "-15.1", "-0.5", "+14.6",
+                       "-12.0", "-6.4", "+5.6",
+                       "-9.0", ".226"),
+  Current_Strong = c(
+    as.character(nrow(df_tc)),
+    as.character(nrow(df_tc)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Man" & df_tc$outcome_f == "Failure"]), 1)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Man" & df_tc$outcome_f == "Success"]), 1)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Man" & df_tc$outcome_f == "Success"]) -
+                       mean(df_tc$trust_change[df_tc$endorser_gender_f == "Man" & df_tc$outcome_f == "Failure"]), 1)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Woman" & df_tc$outcome_f == "Failure"]), 1)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Woman" & df_tc$outcome_f == "Success"]), 1)),
+    as.character(round(mean(df_tc$trust_change[df_tc$endorser_gender_f == "Woman" & df_tc$outcome_f == "Success"]) -
+                       mean(df_tc$trust_change[df_tc$endorser_gender_f == "Woman" & df_tc$outcome_f == "Failure"]), 1)),
+    as.character(b_int),
+    as.character(p_int)
+  )
+)
+
+styled_kable(comp,
+             col.names = c("", "Original N=400 (Strong)", "Strong-Only Pilot"),
+             row.names = FALSE)
+```
+
+\newpage
+
+# Summary of All Tests
+
+```{r all-tests-summary}
+int_term <- "endorser_gender_fWoman:outcome_fSuccess"
+
+all_tests <- data.frame(
+  Test = c("Gender x Outcome (Full)",
+           "Gender x Outcome (Manip Passers)",
+           "Binary: Gender x Outcome (Full)",
+           "Binary: Gender x Outcome (Manip Passers)"),
+  N = c(nrow(df_tc), nrow(df_pass_tc), nrow(df_tc), nrow(df_pass_tc)),
+  b = c(safe_coef(model_primary, int_term),
+        safe_coef(model_pass, int_term),
+        safe_coef(model_binary, int_term),
+        safe_coef(model_binary_pass, int_term)),
+  p = c(safe_p(model_primary, int_term),
+        safe_p(model_pass, int_term),
+        safe_p(model_binary, int_term),
+        safe_p(model_binary_pass, int_term))
+)
+
+styled_kable(all_tests,
+             col.names = c("Test", "N", "Interaction b", "Interaction p"),
+             row.names = FALSE)
+```
