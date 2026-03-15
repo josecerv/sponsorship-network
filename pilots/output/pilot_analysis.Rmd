@@ -72,6 +72,44 @@ tibble(
   kable(digits = 1, caption = "DV descriptives by sample", booktabs = TRUE)
 ```
 
+```{r dv-distribution, fig.height=8, fig.width=11, fig.cap="Distribution of Trust Change by Strength x Outcome"}
+library(patchwork)
+
+hist_facet <- function(dat, label) {
+  # Compute cell means for vertical lines
+  cell_means <- dat %>%
+    group_by(strength_f, outcome_f) %>%
+    summarise(m = mean(trust_change), n = n(), .groups = "drop")
+
+  ggplot(dat, aes(x = trust_change)) +
+    geom_histogram(binwidth = 5, fill = NAVY, color = "white", alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
+    geom_vline(data = cell_means, aes(xintercept = m),
+               linetype = "solid", color = RED, linewidth = 0.8) +
+    geom_text(data = cell_means, aes(x = m, y = Inf,
+              label = sprintf("M=%.1f (n=%d)", m, n)),
+              vjust = 1.5, hjust = -0.05, color = RED, fontface = "bold", size = 3) +
+    facet_grid(strength_f ~ outcome_f,
+               labeller = labeller(
+                 strength_f = c("weak" = "Weak Endorser", "strong" = "Strong Endorser"),
+                 outcome_f = c("Failure" = "Failure", "Success" = "Success"))) +
+    labs(title = label, x = "Trust Change (D2 - D1)", y = "Count") +
+    theme_bw() +
+    theme(plot.title = element_text(size = 12, face = "bold"),
+          strip.text = element_text(size = 11, face = "bold"))
+}
+
+hist_facet(s1, sprintf("Full Sample (N = %d)", nrow(s1)))
+```
+
+```{r dv-distribution-cq4, fig.height=8, fig.width=11, fig.cap="Distribution of Trust Change by Strength x Outcome (CQ = 4)"}
+hist_facet(s2, sprintf("CQ = 4 (N = %d)", nrow(s2)))
+```
+
+```{r dv-distribution-best, fig.height=8, fig.width=11, fig.cap="Distribution of Trust Change by Strength x Outcome (CQ = 4 + Manip Pass)"}
+hist_facet(s3, sprintf("CQ = 4 + Manip Pass (N = %d)", nrow(s3)))
+```
+
 \newpage
 
 # RQ1: Gender $\times$ Outcome on Trust Change
@@ -87,18 +125,28 @@ plot_rq1 <- function(dat, title_label) {
   pd <- dat %>%
     group_by(endorser_gender_f, outcome_f) %>%
     summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
-              n = n(), .groups = "drop")
+              n = n(), .groups = "drop") %>%
+    mutate(
+      ci_hi = m + 1.96 * se,
+      ci_lo = m - 1.96 * se,
+      label_y = ifelse(m >= 0, ci_hi + 1, ci_lo - 1),
+      label_vjust = ifelse(m >= 0, 0, 1)
+    )
+
+  y_max <- max(pd$ci_hi) + 10
+  y_min <- min(pd$ci_lo) - 10
 
   ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
     geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
-    geom_errorbar(aes(ymin = m - 1.96 * se, ymax = m + 1.96 * se),
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
                   position = position_dodge(0.8), width = 0.25) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-    geom_text(aes(label = sprintf("%.1f\n(n=%d)", m, n)),
+    geom_text(aes(y = label_y, label = sprintf("%.1f (n=%d)", m, n),
+                  vjust = label_vjust),
               position = position_dodge(0.8),
-              vjust = ifelse(pd$m > 0, -0.3, 1.3),
-              size = 4, fontface = "bold") +
+              size = 3.5, fontface = "bold") +
     scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    coord_cartesian(ylim = c(y_min, y_max)) +
     labs(title = title_label, x = "D1 Outcome",
          y = "Trust Change (D2 - D1)", fill = "Endorser Gender") +
     theme_bw() +
@@ -187,21 +235,31 @@ plot_rq2 <- function(dat, title_label) {
   pd <- dat %>%
     group_by(endorser_gender_f, outcome_f, strength_f) %>%
     summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
-              n = n(), .groups = "drop")
+              n = n(), .groups = "drop") %>%
+    mutate(
+      ci_hi = m + 1.96 * se,
+      ci_lo = m - 1.96 * se,
+      label_y = ifelse(m >= 0, ci_hi + 1, ci_lo - 1),
+      label_vjust = ifelse(m >= 0, 0, 1)
+    )
+
+  y_max <- max(pd$ci_hi) + 8
+  y_min <- min(pd$ci_lo) - 8
 
   ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
     geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
-    geom_errorbar(aes(ymin = m - 1.96 * se, ymax = m + 1.96 * se),
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
                   position = position_dodge(0.8), width = 0.25) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-    geom_text(aes(label = sprintf("%.1f\n(n=%d)", m, n)),
+    geom_text(aes(y = label_y, label = sprintf("%.1f (n=%d)", m, n),
+                  vjust = label_vjust),
               position = position_dodge(0.8),
-              vjust = ifelse(pd$m > 0, -0.3, 1.3),
-              size = 3.5, fontface = "bold") +
+              size = 3, fontface = "bold") +
     facet_wrap(~ strength_f, nrow = 1,
                labeller = labeller(strength_f = c("weak" = "Weak Endorser",
                                                    "strong" = "Strong Endorser"))) +
     scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    coord_cartesian(ylim = c(y_min, y_max)) +
     labs(title = title_label, x = "D1 Outcome",
          y = "Trust Change (D2 - D1)", fill = "Endorser Gender") +
     theme_bw() +
@@ -297,4 +355,115 @@ bind_rows(
 ) %>%
   kable(digits = c(0, 0, 2, 3, 2, 3),
         caption = "RQ2: Key interaction coefficients across samples", booktabs = TRUE)
+```
+
+\newpage
+
+# RQ3: Initial Trust by Gender $\times$ Strength
+
+Do evaluators extend different levels of initial trust to male versus female endorsers, and does endorsement strength moderate this?
+
+$$\text{D1 Wager}_i = \beta_0 + \beta_1\text{Female} + \beta_2\text{Strong} + \beta_3(\text{Female} \times \text{Strong}) + \varepsilon_i$$
+
+## Full Sample (N = `r nrow(s1)`)
+
+```{r rq3-fig-full, fig.height=5, fig.cap="RQ3: Full Sample"}
+plot_rq3 <- function(dat, title_label) {
+  pd <- dat %>%
+    group_by(endorser_gender_f, strength_f) %>%
+    summarise(m = mean(trust_d1), se = sd(trust_d1) / sqrt(n()),
+              n = n(), .groups = "drop") %>%
+    mutate(
+      ci_hi = m + 1.96 * se,
+      ci_lo = m - 1.96 * se
+    )
+
+  y_max <- max(pd$ci_hi) + 10
+
+  ggplot(pd, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                  position = position_dodge(0.8), width = 0.25) +
+    geom_text(aes(y = ci_hi + 1, label = sprintf("%.1f (n=%d)", m, n)),
+              position = position_dodge(0.8),
+              vjust = 0,
+              size = 3.5, fontface = "bold") +
+    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    scale_x_discrete(labels = c("weak" = "Weak Endorser", "strong" = "Strong Endorser")) +
+    coord_cartesian(ylim = c(0, y_max)) +
+    labs(title = title_label, x = "Endorsement Strength",
+         y = "Initial Wager (D1)", fill = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 13))
+}
+
+plot_rq3(s1, sprintf("RQ3: Initial Trust by Gender x Strength — Full Sample (N = %d)", nrow(s1)))
+```
+
+```{r rq3-reg-full, results='markup'}
+summary(lm(trust_d1 ~ endorser_gender_f * strength_f, data = s1))
+```
+
+\newpage
+
+## CQ = 4 (N = `r nrow(s2)`)
+
+```{r rq3-fig-cq4, fig.height=5, fig.cap="RQ3: CQ = 4"}
+plot_rq3(s2, sprintf("RQ3: Initial Trust by Gender x Strength — CQ = 4 (N = %d)", nrow(s2)))
+```
+
+```{r rq3-reg-cq4, results='markup'}
+summary(lm(trust_d1 ~ endorser_gender_f * strength_f, data = s2))
+```
+
+\newpage
+
+## CQ = 4 + Manip Pass (N = `r nrow(s3)`)
+
+```{r rq3-fig-best, fig.height=5, fig.cap="RQ3: CQ = 4 + Manip Pass"}
+plot_rq3(s3, sprintf("RQ3: Initial Trust by Gender x Strength — CQ = 4 + Manip Pass (N = %d)", nrow(s3)))
+```
+
+```{r rq3-reg-best, results='markup'}
+summary(lm(trust_d1 ~ endorser_gender_f * strength_f, data = s3))
+```
+
+\newpage
+
+## RQ3 Summary
+
+```{r rq3-summary}
+rq3_row <- function(dat, label) {
+  mw_w <- mean(dat$trust_d1[dat$endorser_gender == "Male" & dat$strength_cond == "weak"])
+  ms_w <- mean(dat$trust_d1[dat$endorser_gender == "Male" & dat$strength_cond == "strong"])
+  fw_w <- mean(dat$trust_d1[dat$endorser_gender == "Female" & dat$strength_cond == "weak"])
+  fs_w <- mean(dat$trust_d1[dat$endorser_gender == "Female" & dat$strength_cond == "strong"])
+
+  m <- lm(trust_d1 ~ endorser_gender_f * strength_f, data = dat)
+  cs <- summary(m)$coefficients
+  fem_row <- "endorser_gender_fFemale"
+  ix_row <- "endorser_gender_fFemale:strength_fstrong"
+
+  tibble(
+    Sample = label, N = nrow(dat),
+    `M Weak` = mw_w, `M Strong` = ms_w, `M Diff` = ms_w - mw_w,
+    `F Weak` = fw_w, `F Strong` = fs_w, `F Diff` = fs_w - fw_w,
+    `Female b` = cs[fem_row, "Estimate"],
+    `Female p` = cs[fem_row, "Pr(>|t|)"],
+    `G x S b` = cs[ix_row, "Estimate"],
+    `G x S p` = cs[ix_row, "Pr(>|t|)"]
+  )
+}
+
+bind_rows(
+  rq3_row(s1, "Full"),
+  rq3_row(s2, "CQ = 4"),
+  rq3_row(s3, "CQ=4 + Manip")
+) %>%
+  kable(digits = c(0, 0, 1, 1, 1, 1, 1, 1, 2, 3, 2, 3),
+        caption = "RQ3: Initial trust (D1 wager) by Gender x Strength across samples",
+        booktabs = TRUE)
 ```
