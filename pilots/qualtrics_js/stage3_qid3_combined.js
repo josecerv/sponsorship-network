@@ -281,9 +281,8 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     endMeta.textContent = "ID " + endorserId;
     selIDEl.textContent = chosen.id;
 
-    // 4. Confidence bar: gender-colored fill
+    // Confidence bar
     eFill.style.width = strength + "%";
-    eFill.style.background = gs.barColor;
     eReading.setAttribute('aria-label', 'Endorsement strength: ' + strength + '%, ' + interpStrength(strength));
     eReading.textContent = strength + "% \u2014 " + interpStrength(strength);
 

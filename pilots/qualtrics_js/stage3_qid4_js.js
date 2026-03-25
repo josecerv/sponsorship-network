@@ -183,7 +183,6 @@ Qualtrics.SurveyEngine.addOnReady(function () {
 
     // 4. Confidence bar: gender-colored fill (display 10-90 scale, varied from Q1)
     eFill.style.width = displayStrength + "%";
-    eFill.style.background = gs.barColor;
     eReading.setAttribute('aria-label', 'Endorsement strength: ' + displayStrength + '%, ' + interpStrength(displayStrength));
     eReading.textContent = displayStrength + "% \u2014 " + interpStrength(displayStrength);
 
