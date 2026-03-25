@@ -258,7 +258,7 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     endImg.style.border = gs.border;
     endImg.style.backgroundColor = gs.bg;
     endImg.style.boxShadow = gs.shadow;
-    if (endorserGender === "Woman") endImg.style.objectPosition = "40% center";
+    if (endorserGender === "Woman") endImg.style.objectPosition = "44% center";
 
     // 2. Badge: colored pill
     var badge = document.querySelector('#stage3-eval .badge');
