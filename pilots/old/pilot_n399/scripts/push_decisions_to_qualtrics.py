@@ -5,23 +5,12 @@ Updates:
   - QuestionText (HTML): $2 bonus → $0.50 bank, stake → wager, judgment → confidence
   - QuestionJS: new JS with $0.50 scheme, strength-based display, Q2 constant strength
 """
-import requests, json, sys, os
+import requests, json, sys
 from pathlib import Path
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
-    API_KEY = os.getenv("QUALTRICS_API_KEY")
-except ImportError:
-    env_path = Path(__file__).resolve().parent.parent.parent / ".env"
-    API_KEY = None
-    for line in env_path.read_text().splitlines():
-        if line.startswith("QUALTRICS_API_KEY="):
-            API_KEY = line.split("=", 1)[1].strip().strip('"').strip("'")
-            break
-
+API_KEY = "BJ6aDiEgtQihneCgtZycVLYjaj0ao9gYkdRkb1UZ"
 BASE = "https://wharton.yul1.qualtrics.com"
-SURVEY_ID = "SV_9Fj2oJ5lxuFUXAy"
+SURVEY_ID = "SV_3pKxM5BRYEbluYe"
 HEADERS = {"X-API-TOKEN": API_KEY, "Content-Type": "application/json"}
 
 PROJECT = Path(__file__).resolve().parent.parent  # pilots/

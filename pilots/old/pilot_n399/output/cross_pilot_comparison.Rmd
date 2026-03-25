@@ -1,0 +1,215 @@
+---
+title: "Cross-Pilot Comparison"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document:
+    toc: no
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
+  - \usepackage{geometry}
+  - \geometry{margin=0.9in}
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(
+  echo = FALSE, message = FALSE, warning = FALSE,
+  fig.width = 10, fig.height = 5.5, fig.pos = "H"
+)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+
+NAVY <- "#011F5B"
+RED  <- "#990000"
+```
+
+```{r load-data}
+# ── Old pilots (shared raw export) ──
+raw <- read.csv("../old/output/stage3_pilot_data.csv", stringsAsFactors = FALSE)
+raw <- raw[-c(1, 2), ]
+for (col in c("stake_percent_q1", "stake_percent_q2",
+              "endorser_slider_value_q1", "endorser_slider_value_q2",
+              "Finished", "stage3_q1_is_correct")) {
+  if (col %in% names(raw)) raw[[col]] <- suppressWarnings(as.numeric(raw[[col]]))
+}
+
+prep_old <- function(df) {
+  df <- df %>%
+    filter(Q42 == "2",
+           !is.na(assigned_condition), trimws(assigned_condition) != "",
+           !is.na(stake_percent_q1)) %>%
+    mutate(
+      gender   = ifelse(grepl("^M_", assigned_condition), "Male", "Female"),
+      outcome  = ifelse(stage3_q1_is_correct == 1, "Success", "Failure"),
+      strength = ifelse(grepl("_strong$", assigned_condition), "Strong", "Weak"),
+      trust_change = stake_percent_q2 - stake_percent_q1,
+      trust_d1 = stake_percent_q1,
+      q44_resp = case_when(Q44 == "1" ~ "Male", Q44 == "2" ~ "Female", TRUE ~ NA_character_),
+      manip_pass = (q44_resp == gender)
+    ) %>%
+    filter(!is.na(trust_change))
+  df$gender   <- factor(df$gender,   levels = c("Male", "Female"))
+  df$outcome  <- factor(df$outcome,  levels = c("Failure", "Success"))
+  df$strength <- factor(df$strength, levels = c("Weak", "Strong"))
+  df
+}
+
+base <- raw %>%
+  filter(Status != "1", Finished == 1,
+         !is.na(PROLIFIC_PID), trimws(PROLIFIC_PID) != "")
+
+d100_full <- prep_old(base %>% filter(STUDY_ID == "698e27db580428e78f8e9ff1"))
+d400_full <- prep_old(base %>% filter(STUDY_ID == "699503492f16351efc6be595"))
+
+d100 <- d100_full %>% filter(manip_pass == TRUE)
+d400 <- d400_full %>% filter(manip_pass == TRUE)
+
+# ── Latest pilot (best quality) ──
+latest <- read.csv("study_data_clean.csv", stringsAsFactors = FALSE) %>%
+  filter(best_participant == 1) %>%
+  mutate(
+    gender   = factor(endorser_gender, levels = c("Male", "Female")),
+    outcome  = factor(outcome, levels = c("Failure", "Success")),
+    strength = factor(ifelse(strength_cond == "strong", "Strong", "Weak"),
+                      levels = c("Weak", "Strong"))
+  )
+
+pilots <- list(
+  list(data = d100,   label = sprintf("Pilot 1 (N = %d)", nrow(d100)),   short = "Pilot 1"),
+  list(data = d400,   label = sprintf("Pilot 2 (N = %d)", nrow(d400)),   short = "Pilot 2"),
+  list(data = latest, label = sprintf("Pilot 3 — Best Quality (N = %d)", nrow(latest)), short = "Pilot 3 (Best)")
+)
+```
+
+All three samples are restricted to participants who correctly identified the sponsor's gender (manipulation check pass). Pilot 3 additionally requires all 4 comprehension checks correct.
+
+- **Pilot 1**: N = `r nrow(d100)` after manip-check filter (from `r nrow(d100_full)` total)
+- **Pilot 2**: N = `r nrow(d400)` after manip-check filter (from `r nrow(d400_full)` total)
+- **Pilot 3**: N = `r nrow(latest)` (CQ perfect + manip pass, from `r nrow(read.csv("study_data_clean.csv"))` total)
+
+# RQ1: Gender $\times$ Outcome
+
+```{r rq1-combined-fig, fig.height=4.5, fig.width=11, fig.cap="Trust Change by Sponsor Gender and Outcome across pilots. Error bars = +/- 1 SE."}
+all_rq1 <- bind_rows(
+  lapply(pilots, function(p) {
+    p$data %>%
+      group_by(gender, outcome) %>%
+      summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
+                n = n(), .groups = "drop") %>%
+      mutate(pilot = p$short)
+  })
+) %>%
+  mutate(pilot = factor(pilot, levels = sapply(pilots, `[[`, "short")))
+
+ggplot(all_rq1, aes(x = outcome, y = m, fill = gender)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = m - se, ymax = m + se),
+                position = position_dodge(0.8), width = 0.25) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", m, n),
+                vjust = ifelse(m >= 0, -0.5, 1.5)),
+            position = position_dodge(0.8),
+            size = 3, fontface = "bold") +
+  facet_wrap(~ pilot, nrow = 1) +
+  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+  scale_y_continuous(limits = c(-20, 30), breaks = seq(-20, 30, 10)) +
+  labs(x = "Decision 1 Outcome", y = "Mean Trust Change (D2 - D1)",
+       fill = "Sponsor Gender") +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        strip.text = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12))
+```
+
+```{r rq1-summary-table}
+rq1_summary <- bind_rows(lapply(pilots, function(p) {
+  m <- lm(trust_change ~ gender * outcome, data = p$data)
+  cs <- summary(m)$coefficients
+  ix <- "genderFemale:outcomeSuccess"
+  male_b <- cs["outcomeSuccess", "Estimate"]
+  female_b <- male_b + cs[ix, "Estimate"]
+  tibble(
+    Pilot = p$short,
+    N = nrow(p$data),
+    `Male Success Boost` = round(male_b, 1),
+    `Female Success Boost` = round(female_b, 1),
+    `Interaction b` = round(cs[ix, "Estimate"], 1),
+    `Interaction p` = round(cs[ix, "Pr(>|t|)"], 3)
+  )
+}))
+
+kable(rq1_summary, booktabs = TRUE, row.names = FALSE,
+      caption = "Gender x Outcome interaction on trust change")
+```
+
+\newpage
+
+# Three-Way Interaction: Gender $\times$ Strength $\times$ Outcome
+
+```{r rq4-combined-fig, fig.height=6.5, fig.width=11, fig.cap="Trust Change by Sponsor Gender, Strength, and Outcome across pilots. Error bars = +/- 1 SE."}
+all_rq4 <- bind_rows(
+  lapply(pilots, function(p) {
+    p$data %>%
+      group_by(gender, strength, outcome) %>%
+      summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
+                n = n(), .groups = "drop") %>%
+      mutate(pilot = p$short)
+  })
+) %>%
+  mutate(pilot = factor(pilot, levels = sapply(pilots, `[[`, "short")))
+
+ggplot(all_rq4, aes(x = outcome, y = m, fill = gender)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = m - se, ymax = m + se),
+                position = position_dodge(0.8), width = 0.25) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_text(aes(label = sprintf("%.1f\n(n=%d)", m, n),
+                vjust = ifelse(m >= 0, -0.3, 1.3)),
+            position = position_dodge(0.8),
+            size = 2.5, fontface = "bold") +
+  facet_grid(strength ~ pilot,
+             labeller = labeller(
+               strength = c("Weak" = "Weak Endorsement", "Strong" = "Strong Endorsement"))) +
+  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+  scale_y_continuous(breaks = seq(-40, 50, 10)) +
+  labs(x = "Decision 1 Outcome", y = "Mean Trust Change (D2 - D1)",
+       fill = "Sponsor Gender") +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        strip.text = element_text(size = 11, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12))
+```
+
+```{r rq4-regression-summary}
+rq4_summary <- bind_rows(lapply(pilots, function(p) {
+  m <- lm(trust_change ~ gender * strength * outcome, data = p$data)
+  cs <- summary(m)$coefficients
+
+  go  <- "genderFemale:outcomeSuccess"
+  gso <- "genderFemale:strengthStrong:outcomeSuccess"
+
+  safe_b <- function(term) if (term %in% rownames(cs)) round(cs[term, "Estimate"], 1) else NA
+  safe_p <- function(term) if (term %in% rownames(cs)) round(cs[term, "Pr(>|t|)"], 3) else NA
+
+  tibble(
+    Pilot = p$short,
+    N = nrow(p$data),
+    `Gender x Outcome b` = safe_b(go),
+    `Gender x Outcome p` = safe_p(go),
+    `3-Way b` = safe_b(gso),
+    `3-Way p` = safe_p(gso)
+  )
+}))
+
+kable(rq4_summary, booktabs = TRUE, row.names = FALSE,
+      caption = "Three-way interaction regression summary")
+```

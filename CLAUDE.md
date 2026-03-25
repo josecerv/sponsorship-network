@@ -4,7 +4,8 @@
 Behavioral experiment studying how evaluators update trust in endorsers across two decisions (pre/post outcome feedback). Built on Qualtrics with Prolific recruitment.
 
 ## Active Survey
-- **Survey ID:** `SV_3pKxM5BRYEbluYe` (Qualtrics, Wharton `yul1` datacenter)
+- **Survey ID:** `SV_9Fj2oJ5lxuFUXAy` (Qualtrics, Wharton `yul1` datacenter)
+- **Previous survey:** `SV_3pKxM5BRYEbluYe` (pilot_n399, archived)
 - **API credentials:** `.env` file (QUALTRICS_API_KEY, QUALTRICS_BASE_URL)
 - **Decisions block:** QID3 (D1), QID5 (D2/outcome), QID4 (D3)
 
@@ -16,16 +17,19 @@ Behavioral experiment studying how evaluators update trust in endorsers across t
 - Terminology: "wager" (not "stake"), "$0.50 bank" (not "$2 bonus")
 
 ## Endorser Display
-- **Strength-based** (single-direction 0-100%), NOT bipolar A-B scale
-- `endorserStrength(v) = |v - 50| × 2` converts raw 0-100 slider → 0-100 strength
-- Labels: ≤5% "unsure", ≤33% "low confidence", ≤66% "moderately confident", >66% "very confident"
+- **Strength-based**, raw 0-100 mapped to **10-90 display range** via `displayConfidence()`
+- `endorserStrength(v) = |v - 50| × 2` converts raw slider → 0-100 raw strength
+- `displayConfidence(raw) = round(10 + raw * 0.8)` maps raw → 10-90 display
+- Labels (on 10-90 scale): ≤14 "unsure", ≤36 "low confidence", ≤63 "moderately confident", >63 "very confident"
 - HTML label: "Endorser's confidence" (not "judgment")
+- **Colored avatars:** Pink (#EC4899) circle for Woman, Blue (#3B82F6) circle for Man (inline SVG data URIs)
 
-## Q2 Constant Strength
-- QID4 (D3) displays **Q1's endorsement strength** for Q2, not Q2's own strength
-- This holds the displayed confidence constant across D1→D3, so DV (stake_q2 - stake_q1) is clean
+## Q2 Varied Strength
+- QID4 (D3) displays **Q1's display confidence ± 5-12 points**, clamped to same tercile
+- Terciles on 10-90 scale: Low (10-36), Mid (37-63), High (64-90)
+- This adds natural variance while keeping Q2 in the same confidence zone as Q1
 - Real Q2 slider value still used for `favoredSide` (which candidate was endorsed)
-- Both raw Q2 value and displayed strength saved as embedded data
+- Saved embedded data: `endorser_display_strength_q1`, `endorser_display_strength_q2`, `endorser_q2_variance_delta`
 
 ## 8 Experimental Conditions
 `{M,W}_{correct,incorrect}_{strong,weak}` — Gender × Accuracy × Endorsement Strength
@@ -43,7 +47,7 @@ pilots/
   tests/                  # Playwright browser tests
     test_stage3_js.py
   output/                 # Data exports, generated files
-  old/                    # Archived pilot material (n100, n400, n400_strong)
+  old/                    # Archived pilot material (n100, n399, n400, n400_strong)
 ```
 
 ## Testing

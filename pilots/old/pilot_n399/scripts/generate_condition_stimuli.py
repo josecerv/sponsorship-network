@@ -8,17 +8,30 @@ UPDATED: March 2026 — $0.50 bank, wager terminology, strength display,
 Q2 shows Q1's strength (constant).
 """
 
+import base64, urllib.request, ssl
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_PDF  = SCRIPT_DIR.parent / "output" / "condition_stimuli.pdf"
 OUTPUT_HTML = SCRIPT_DIR.parent / "output" / "condition_stimuli.html"
 
-# ── Inline SVG endorser icons (no download needed) ──
+# ── Download endorser icons as data URIs ──
+def download_icon(url):
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, context=ctx) as resp:
+        data = resp.read()
+        ct = resp.headers.get("Content-Type", "image/png")
+    return f"data:{ct};base64,{base64.b64encode(data).decode()}"
+
+print("Downloading endorser icons...")
 ICON = {
-    "Woman": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%23EC4899'/%3E%3Ccircle cx='60' cy='44' r='18' fill='white'/%3E%3Cpath d='M30 112 C30 86 43 74 60 74 C77 74 90 86 90 112' fill='white'/%3E%3C/svg%3E",
-    "Man":   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%233B82F6'/%3E%3Ccircle cx='60' cy='44' r='18' fill='white'/%3E%3Cpath d='M30 112 C30 86 43 74 60 74 C77 74 90 86 90 112' fill='white'/%3E%3C/svg%3E",
+    "Woman": download_icon("https://wharton.yul1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rPkPsDPTOJEHbxS"),
+    "Man":   download_icon("https://wharton.yul1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2XVqkTCg6PGauA7"),
 }
+print("  Icons downloaded.")
 
 # ── STIM pairs (from Qualtrics JS) ──
 STIM = {
@@ -60,14 +73,11 @@ CONDITION_POOLS = {
 def endorser_strength(v):
     return abs(int(v) - 50) * 2
 
-def display_confidence(raw_strength):
-    return round(10 + (raw_strength / 100) * 80)
-
-def interp_strength(d):
-    d = int(d)
-    if d <= 14: return "unsure"
-    if d <= 36: return "low confidence"
-    if d <= 63: return "moderately confident"
+def interp_strength(s):
+    s = int(s)
+    if s <= 5: return "unsure"
+    if s <= 33: return "low confidence"
+    if s <= 66: return "moderately confident"
     return "very confident"
 
 COND_ORDER = [
@@ -144,7 +154,7 @@ DOCUMENT_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Stage 3 Condition Stimuli (New Pilot, March 2026)</title>
+<title>Stage 3 Condition Stimuli (Updated March 2026)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -293,34 +303,28 @@ for idx, cond in enumerate(COND_ORDER):
     q1_pair = STIM[row["q1_pid"]]
     q1_chosen = q1_pair["B" if q1_sv > 50 else "A"]
     q1_strength = endorser_strength(q1_sv)
-    q1_display = display_confidence(q1_strength)
 
     left = PANEL_HTML.format(
         panel_title="D1 &mdash; Wager 1 (Pre-Outcome)",
         icon_src=icon_src, endorser_id=endorser_id,
         selected_id=q1_chosen["id"],
-        strength_pct=q1_display,
-        strength_text=interp_strength(q1_display),
+        strength_pct=q1_strength,
+        strength_text=interp_strength(q1_strength),
     )
 
-    # D3 (Wager 2) — displays Q1 display + small variance
+    # D3 (Wager 2) — displays Q1's strength (constant)
     q2_sv = int(row["q2_sv"])
     q2_pair = STIM[row["q2_pid"]]
     q2_chosen = q2_pair["B" if q2_sv > 50 else "A"]
-    # D3 display: Q1 display + small variance
-    if q1_display <= 36:
-        q2_display = min(36, q1_display + 8)
-    elif q1_display <= 63:
-        q2_display = q1_display + 5
-    else:
-        q2_display = max(64, q1_display - 8)
+    # Q2 displays Q1's strength, not its own
+    display_strength = q1_strength
 
     right = PANEL_HTML.format(
         panel_title=f"D3 &mdash; Wager 2, Post-Outcome (Endorser: {correctness.title()})",
         icon_src=icon_src, endorser_id=endorser_id,
         selected_id=q2_chosen["id"],
-        strength_pct=q2_display,
-        strength_text=interp_strength(q2_display),
+        strength_pct=display_strength,
+        strength_text=interp_strength(display_strength),
     )
 
     pages_html.append(CELL_PAGE_HTML.format(

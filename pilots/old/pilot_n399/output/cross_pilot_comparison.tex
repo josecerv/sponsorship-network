@@ -1,0 +1,220 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{booktabs}
+\usepackage{float}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+\usepackage{geometry}
+\geometry{margin=0.9in}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Cross-Pilot Comparison},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Cross-Pilot Comparison}
+\author{}
+\date{\vspace{-2.5em}March 17, 2026}
+
+\begin{document}
+\maketitle
+
+All three samples are restricted to participants who correctly
+identified the sponsor's gender (manipulation check pass). Pilot 3
+additionally requires all 4 comprehension checks correct.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pilot 1}: N = 76 after manip-check filter (from 100 total)
+\item
+  \textbf{Pilot 2}: N = 324 after manip-check filter (from 399 total)
+\item
+  \textbf{Pilot 3}: N = 139 (CQ perfect + manip pass, from 399 total)
+\end{itemize}
+
+\section{\texorpdfstring{RQ1: Gender \(\times\)
+Outcome}{RQ1: Gender \textbackslash times Outcome}}\label{rq1-gender-times-outcome}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{cross_pilot_comparison_files/figure-latex/rq1-combined-fig-1.pdf}}
+\caption{Trust Change by Sponsor Gender and Outcome across pilots. Error
+bars = +/- 1 SE.}
+\end{figure}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1724}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0460}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2184}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2414}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1609}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1609}}@{}}
+\caption{Gender x Outcome interaction on trust change}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pilot
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Male Success Boost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Female Success Boost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Interaction b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Interaction p
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pilot
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Male Success Boost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Female Success Boost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Interaction b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Interaction p
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Pilot 1 & 76 & 32.8 & 4.8 & -28.0 & 0.157 \\
+Pilot 2 & 324 & 12.2 & 5.7 & -6.4 & 0.420 \\
+Pilot 3 (Best) & 139 & 25.2 & 11.6 & -13.6 & 0.199 \\
+\end{longtable}
+
+\newpage
+
+\section{\texorpdfstring{Three-Way Interaction: Gender \(\times\)
+Strength \(\times\)
+Outcome}{Three-Way Interaction: Gender \textbackslash times Strength \textbackslash times Outcome}}\label{three-way-interaction-gender-times-strength-times-outcome}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{cross_pilot_comparison_files/figure-latex/rq4-combined-fig-1.pdf}}
+\caption{Trust Change by Sponsor Gender, Strength, and Outcome across
+pilots. Error bars = +/- 1 SE.}
+\end{figure}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2055}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0548}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2603}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2603}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1096}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1096}}@{}}
+\caption{Three-way interaction regression summary}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pilot
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gender x Outcome b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gender x Outcome p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+3-Way b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+3-Way p
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pilot
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gender x Outcome b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gender x Outcome p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+3-Way b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+3-Way p
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Pilot 1 & 76 & -19.6 & 0.461 & -9.0 & 0.819 \\
+Pilot 2 & 324 & 7.3 & 0.442 & -15.2 & 0.250 \\
+Pilot 3 (Best) & 139 & -5.5 & 0.695 & -5.3 & 0.801 \\
+\end{longtable}
+
+\end{document}

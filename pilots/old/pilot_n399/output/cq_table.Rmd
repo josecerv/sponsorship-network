@@ -1,0 +1,54 @@
+---
+title: "Comprehension Check Results — Latest Pilot (N = 399)"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{float}
+  - \floatplacement{table}{H}
+  - \pagenumbering{gobble}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(dplyr)
+library(knitr)
+```
+
+```{r}
+d <- read.csv("study_data_clean.csv", stringsAsFactors = FALSE)
+N <- nrow(d)
+
+cq_tbl <- data.frame(
+  Question = c("CQ1", "CQ2", "CQ3", "CQ4"),
+  Content = c(
+    "What counts as a correct endorser prediction?",
+    "How much do you start with per decision? ($0.50)",
+    "You wager 50%, endorser was right — what do you earn? ($0.75)",
+    "How is your total bonus calculated? (Sum of both)"
+  ),
+  Correct = c(sum(d$cq1_correct), sum(d$cq2_correct),
+              sum(d$cq3_correct), sum(d$cq4_correct)),
+  Total = N,
+  stringsAsFactors = FALSE
+) %>%
+  mutate(Rate = sprintf("%.1f%%", Correct / Total * 100))
+
+kable(cq_tbl,
+      col.names = c("Question", "What it asks", "Correct", "Total", "Pass Rate"),
+      booktabs = TRUE, row.names = FALSE,
+      caption = "Comprehension check pass rates by question")
+```
+
+```{r}
+score_tbl <- d %>%
+  count(cq_score) %>%
+  mutate(Pct = sprintf("%.1f%%", n / sum(n) * 100))
+
+kable(score_tbl,
+      col.names = c("CQ Score (out of 4)", "N", "%"),
+      booktabs = TRUE, row.names = FALSE,
+      caption = "Distribution of comprehension check scores")
+```

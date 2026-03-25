@@ -38,18 +38,9 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   var tagIncorrect   = document.getElementById('tag_happened_incorrect');
 
   // Icons
-  // Icons
   var ICON = {
     "Woman": "https://wharton.yul1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_rPkPsDPTOJEHbxS",
     "Man":   "https://wharton.yul1.qualtrics.com/ControlPanel/Graphic.php?IM=IM_2XVqkTCg6PGauA7"
-  };
-  var GENDER_STYLE = {
-    "Woman": {border:"3px solid #DB2777", bg:"#FDF2F8", shadow:"0 0 0 3px #FBCFE8",
-              badgeBg:"#FCE7F3", badgeColor:"#9D174D",
-              cardBorder:"4px solid #EC4899", cardBg:"#FDF2F8", barColor:"#EC4899"},
-    "Man":   {border:"3px solid #2563EB", bg:"#EFF6FF", shadow:"0 0 0 3px #BFDBFE",
-              badgeBg:"#DBEAFE", badgeColor:"#1E40AF",
-              cardBorder:"4px solid #3B82F6", cardBg:"#EFF6FF", barColor:"#3B82F6"}
   };
 
   // ── Helpers ──
@@ -57,17 +48,11 @@ Qualtrics.SurveyEngine.addOnReady(function () {
     return Math.abs(Number(v) - 50) * 2;
   }
 
-  // Map raw 0-100 strength to 10-90 display range
-  function displayConfidence(rawStrength) {
-    return Math.round(10 + (rawStrength / 100) * 80);
-  }
-
-  // Labels based on display confidence (10-90 scale)
-  function interpStrength(d) {
-    d = Number(d);
-    if (d <= 14) return "unsure";
-    if (d <= 36) return "low confidence";
-    if (d <= 63) return "moderately confident";
+  function interpStrength(s) {
+    s = Number(s);
+    if (s <= 5) return "unsure";
+    if (s <= 33) return "low confidence";
+    if (s <= 66) return "moderately confident";
     return "very confident";
   }
 
@@ -91,47 +76,22 @@ Qualtrics.SurveyEngine.addOnReady(function () {
 
   var isCorrect = (selectedSide && truthSide) ? (selectedSide === truthSide) : false;
 
-  // Compute endorsement strength for display (raw 0-100, then mapped to 10-90)
-  var rawStrength = endorserStrength(eVal);
-  var strength = displayConfidence(rawStrength);
+  // Compute endorsement strength for display
+  var strength = endorserStrength(eVal);
 
   function populate(){
     // Header cards
     endImg.src = (endorserGender === "Woman") ? ICON.Woman : ICON.Man;
     endImg.alt = "Endorser";
     endImg.onerror = function(){ this.style.display='none'; };
-    var gs = GENDER_STYLE[endorserGender] || GENDER_STYLE.Man;
-
-    // 1. Avatar: colored border + tinted bg + glow ring
-    endImg.style.border = gs.border;
-    endImg.style.backgroundColor = gs.bg;
-    endImg.style.boxShadow = gs.shadow;
-    if (endorserGender === "Woman") endImg.style.objectPosition = "center 20%";
-
-    // 2. Badge: colored pill
     var badge = document.querySelector('#stage3-outcome .badge');
-    if (badge) {
-      badge.textContent = "Endorser";
-      badge.style.backgroundColor = gs.badgeBg;
-      badge.style.color = gs.badgeColor;
-      badge.style.padding = "3px 12px";
-      badge.style.borderRadius = "12px";
-      badge.style.fontWeight = "700";
-    }
-
-    // 3. Endorser card: colored left accent + tinted background
-    var endorserCard = endImg ? endImg.closest('.card') : null;
-    if (endorserCard) {
-      endorserCard.style.borderLeft = gs.cardBorder;
-      endorserCard.style.backgroundColor = gs.cardBg;
-    }
-
+    if (badge) badge.textContent = "Endorser";
     endMeta.textContent = "ID " + endorserId;
+
     selIDEl.textContent = selectedId;
 
-    // 4. Confidence bar: gender-colored fill
+    // Endorser confidence bar (strength-based)
     eFill.style.width = strength + "%";
-    eFill.style.background = gs.barColor;
     eReading.setAttribute('aria-label', 'Endorsement strength: ' + strength + '%, ' + interpStrength(strength));
     eReading.textContent = strength + "% \u2014 " + interpStrength(strength);
 
