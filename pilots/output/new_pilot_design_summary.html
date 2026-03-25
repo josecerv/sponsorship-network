@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Pilot Design Summary — March 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11pt;
+    color: #1a1a2e;
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 11in;
+    padding: 0.75in 0.85in;
+    page-break-after: always;
+    position: relative;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+  }
+  h2 {
+    font-size: 15pt;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 10pt;
+    color: #6b7280;
+    margin-bottom: 24px;
+    font-weight: 400;
+  }
+  .date-line {
+    font-size: 10pt;
+    color: #9ca3af;
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+
+  /* Avatar section */
+  .avatar-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 30px 0 28px 0;
+  }
+  .avatar-card {
+    text-align: center;
+    width: 240px;
+  }
+  .avatar-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
+    font-weight: 600;
+    font-size: 13pt;
+    position: relative;
+  }
+  .avatar-circle.woman {
+    border: 4px solid #DB2777;
+    background: #FDF2F8;
+    color: #DB2777;
+    box-shadow: 0 0 18px rgba(219, 39, 119, 0.25);
+  }
+  .avatar-circle.man {
+    border: 4px solid #2563EB;
+    background: #EFF6FF;
+    color: #2563EB;
+    box-shadow: 0 0 18px rgba(37, 99, 235, 0.25);
+  }
+  .avatar-label {
+    font-size: 9.5pt;
+    color: #6b7280;
+    line-height: 1.55;
+    text-align: left;
+    padding: 0 4px;
+  }
+  .avatar-label .color-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 3px;
+  }
+
+  /* Description block */
+  .desc-block {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+  .desc-block p {
+    font-size: 9.5pt;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .desc-block p:last-child { margin-bottom: 0; }
+  .desc-block .cue-list {
+    font-size: 9pt;
+    color: #6b7280;
+    padding-left: 18px;
+    margin-top: 4px;
+  }
+  .desc-block .cue-list li { margin-bottom: 2px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin-bottom: 16px;
+  }
+  thead th {
+    background: #1a1a2e;
+    color: #fff;
+    font-weight: 600;
+    padding: 7px 8px;
+    text-align: left;
+    font-size: 8.5pt;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child { border-radius: 0 6px 0 0; }
+  tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:nth-child(even) { background: #f9fafb; }
+  tbody tr:hover { background: #f0f4ff; }
+
+  /* Condition color coding */
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: 500;
+  }
+  .tag-man { background: #DBEAFE; color: #1D4ED8; }
+  .tag-woman { background: #FCE7F3; color: #BE185D; }
+  .tag-correct { background: #D1FAE5; color: #065F46; }
+  .tag-incorrect { background: #FEE2E2; color: #991B1B; }
+  .tag-strong { background: #E0E7FF; color: #3730A3; }
+  .tag-weak { background: #FEF3C7; color: #92400E; }
+
+  .condition-code {
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 8pt;
+    color: #4b5563;
+    background: #f3f4f6;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+
+  /* Footer notes */
+  .footer-note {
+    font-size: 8.5pt;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .footer-note em { font-style: italic; }
+
+  /* Page 3 sub-tables */
+  .sub-section {
+    margin-bottom: 18px;
+  }
+  .sub-section h3 {
+    margin-bottom: 6px;
+    font-size: 10.5pt;
+  }
+  .tercile-info {
+    font-size: 9pt;
+    color: #6b7280;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+
+  /* Page 4 bullets */
+  .notes-list {
+    padding-left: 20px;
+    font-size: 10pt;
+    line-height: 1.7;
+  }
+  .notes-list li {
+    margin-bottom: 10px;
+    color: #374151;
+  }
+  .notes-list li strong {
+    color: #1a1a2e;
+  }
+  .notes-list code {
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 9pt;
+    background: #f3f4f6;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #7c3aed;
+  }
+
+  /* Print styles */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 0.6in 0.7in; }
+  }
+
+  /* Page number */
+  .page-num {
+    position: absolute;
+    bottom: 0.5in;
+    right: 0.85in;
+    font-size: 8pt;
+    color: #9ca3af;
+  }
+  .page-header-line {
+    border-bottom: 2px solid #1a1a2e;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1 ==================== -->
+<div class="page">
+  <div class="page-header-line">
+    <h1>New Pilot Design Summary</h1>
+    <div class="date-line">March 2026 &mdash; Sponsorship Network Experiment, Stage 3</div>
+  </div>
+
+  <h2>Avatar Icons &amp; Gender Color Treatment</h2>
+  <p class="subtitle">Visual differentiation of endorser gender via color cues applied at runtime</p>
+
+  <div class="avatar-row">
+    <!-- Woman Avatar -->
+    <div class="avatar-card">
+      <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-pink" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feFlood flood-color="#DB2777" flood-opacity="0.25"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle cx="60" cy="60" r="52" fill="#FDF2F8" stroke="#DB2777" stroke-width="4" filter="url(#glow-pink)"/>
+        <!-- Simplified silhouette head -->
+        <circle cx="60" cy="42" r="16" fill="#F9A8D4" opacity="0.5"/>
+        <ellipse cx="60" cy="78" rx="22" ry="16" fill="#F9A8D4" opacity="0.4"/>
+        <text x="60" y="98" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#DB2777">Woman</text>
+      </svg>
+      <div class="avatar-label">
+        <span class="color-swatch" style="background:#DB2777;"></span> <strong>Pink (#DB2777)</strong><br>
+        Border ring &bull; Badge pill &bull; Card accent &bull; Confidence bar fill &bull; Tinted background (#FDF2F8)
+      </div>
+    </div>
+
+    <!-- Man Avatar -->
+    <div class="avatar-card">
+      <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-blue" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feFlood flood-color="#2563EB" flood-opacity="0.25"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <circle cx="60" cy="60" r="52" fill="#EFF6FF" stroke="#2563EB" stroke-width="4" filter="url(#glow-blue)"/>
+        <!-- Simplified silhouette head -->
+        <circle cx="60" cy="42" r="16" fill="#93C5FD" opacity="0.5"/>
+        <ellipse cx="60" cy="78" rx="22" ry="16" fill="#93C5FD" opacity="0.4"/>
+        <text x="60" y="98" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#2563EB">Man</text>
+      </svg>
+      <div class="avatar-label">
+        <span class="color-swatch" style="background:#2563EB;"></span> <strong>Blue (#2563EB)</strong><br>
+        Border ring &bull; Badge pill &bull; Card accent &bull; Confidence bar fill &bull; Tinted background (#EFF6FF)
+      </div>
+    </div>
+  </div>
+
+  <div class="desc-block">
+    <p><strong>Image source:</strong> Original black-and-white silhouette images retained from Stage 2. Gender-salient color treatment is applied dynamically via JavaScript at survey runtime.</p>
+    <p><strong>Five color cues per gender:</strong></p>
+    <ol class="cue-list">
+      <li>Colored border ring on avatar image</li>
+      <li>Tinted background behind avatar</li>
+      <li>Colored "Endorser" badge pill</li>
+      <li>Colored left accent bar on endorser card</li>
+      <li>Gender-colored confidence bar fill</li>
+    </ol>
+  </div>
+
+  <div class="desc-block" style="background:#fffbeb; border-color:#fde68a;">
+    <p style="font-size:9pt; color:#92400e;"><strong>Rationale:</strong> Color treatment makes endorser gender immediately salient without relying on participants to infer gender from silhouette shape alone. The five redundant cues ensure the manipulation is noticed even with fast reading.</p>
+  </div>
+
+  <div class="page-num">1 / 4</div>
+</div>
+
+<!-- ==================== PAGE 2 ==================== -->
+<div class="page">
+  <div class="page-header-line">
+    <h2>8 Experimental Conditions</h2>
+    <p class="subtitle">D1 and D2 Confidence Display &mdash; 2 (Gender) &times; 2 (Outcome) &times; 2 (Strength)</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Condition</th>
+        <th>Gender</th>
+        <th>Outcome</th>
+        <th>Strength</th>
+        <th>D1 Range</th>
+        <th>D1 Avg</th>
+        <th>D2 Envelope</th>
+        <th>Label Zone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="condition-code">M_correct_strong</span></td>
+        <td><span class="tag tag-man">Man</span></td>
+        <td><span class="tag tag-correct">Correct</span></td>
+        <td><span class="tag tag-strong">Strong</span></td>
+        <td>77&ndash;88%</td>
+        <td>82.8%</td>
+        <td>65&ndash;90%</td>
+        <td>very confident</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">M_correct_weak</span></td>
+        <td><span class="tag tag-man">Man</span></td>
+        <td><span class="tag tag-correct">Correct</span></td>
+        <td><span class="tag tag-weak">Weak</span></td>
+        <td>12&ndash;23%</td>
+        <td>17.2%</td>
+        <td>10&ndash;35%</td>
+        <td>unsure / low conf</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">M_incorrect_strong</span></td>
+        <td><span class="tag tag-man">Man</span></td>
+        <td><span class="tag tag-incorrect">Incorrect</span></td>
+        <td><span class="tag tag-strong">Strong</span></td>
+        <td>77&ndash;88%</td>
+        <td>82.8%</td>
+        <td>65&ndash;90%</td>
+        <td>very confident</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">M_incorrect_weak</span></td>
+        <td><span class="tag tag-man">Man</span></td>
+        <td><span class="tag tag-incorrect">Incorrect</span></td>
+        <td><span class="tag tag-weak">Weak</span></td>
+        <td>12&ndash;23%</td>
+        <td>17.2%</td>
+        <td>10&ndash;35%</td>
+        <td>unsure / low conf</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">W_correct_strong</span></td>
+        <td><span class="tag tag-woman">Woman</span></td>
+        <td><span class="tag tag-correct">Correct</span></td>
+        <td><span class="tag tag-strong">Strong</span></td>
+        <td>77&ndash;88%</td>
+        <td>82.8%</td>
+        <td>65&ndash;90%</td>
+        <td>very confident</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">W_correct_weak</span></td>
+        <td><span class="tag tag-woman">Woman</span></td>
+        <td><span class="tag tag-correct">Correct</span></td>
+        <td><span class="tag tag-weak">Weak</span></td>
+        <td>12&ndash;23%</td>
+        <td>17.2%</td>
+        <td>10&ndash;35%</td>
+        <td>unsure / low conf</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">W_incorrect_strong</span></td>
+        <td><span class="tag tag-woman">Woman</span></td>
+        <td><span class="tag tag-incorrect">Incorrect</span></td>
+        <td><span class="tag tag-strong">Strong</span></td>
+        <td>77&ndash;88%</td>
+        <td>82.8%</td>
+        <td>65&ndash;90%</td>
+        <td>very confident</td>
+      </tr>
+      <tr>
+        <td><span class="condition-code">W_incorrect_weak</span></td>
+        <td><span class="tag tag-woman">Woman</span></td>
+        <td><span class="tag tag-incorrect">Incorrect</span></td>
+        <td><span class="tag tag-weak">Weak</span></td>
+        <td>12&ndash;23%</td>
+        <td>17.2%</td>
+        <td>10&ndash;35%</td>
+        <td>unsure / low conf</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="desc-block">
+    <p><strong>Key:</strong></p>
+    <p style="font-size:9pt;">
+      <strong>D1 Range</strong> = displayed confidence values drawn from the 8-endorser pool for Decision 1.<br>
+      <strong>D1 Avg</strong> = mean display confidence across the 8 endorsers in each cell.<br>
+      <strong>D2 Envelope</strong> = the full range of possible D2 display values after applying the &plusmn;5&ndash;12 jitter and tercile clamping.<br>
+      <strong>Label Zone</strong> = the qualitative label shown to participants (derived from display confidence).
+    </p>
+  </div>
+
+  <div class="footer-note">
+    <em>Strong and Weak averages are symmetric around the 50% midpoint: 82.8% and 17.2% are each 32.8 percentage points from center. This ensures the strength manipulation is balanced in magnitude.</em>
+  </div>
+
+  <div class="page-num">2 / 4</div>
+</div>
+
+<!-- ==================== PAGE 3 ==================== -->
+<div class="page">
+  <div class="page-header-line">
+    <h2>Decision 1 vs Decision 2 Display Variance</h2>
+    <p class="subtitle">D2 = D1 &plusmn; random(5..12), clamped to same tercile</p>
+  </div>
+
+  <p class="tercile-info">Tercile boundaries: Low [10&ndash;36] &nbsp;|&nbsp; Mid [37&ndash;63] &nbsp;|&nbsp; High [64&ndash;90]</p>
+
+  <div class="sub-section">
+    <h3>Strong Conditions <span style="font-weight:400; color:#6b7280;">(all 4 gender &times; outcome cells share identical structure)</span></h3>
+    <table>
+      <thead>
+        <tr>
+          <th>D1 Display</th>
+          <th>D2 Min</th>
+          <th>D2 Max</th>
+          <th>Possible Delta</th>
+          <th>Always "very confident"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>77%</td><td>65%</td><td>89%</td><td>&minus;12 to +12</td><td>Yes</td></tr>
+        <tr><td>79%</td><td>67%</td><td>90%</td><td>&minus;12 to +11</td><td>Yes</td></tr>
+        <tr><td>80%</td><td>68%</td><td>90%</td><td>&minus;12 to +10</td><td>Yes</td></tr>
+        <tr><td>82%</td><td>70%</td><td>90%</td><td>&minus;12 to +8</td><td>Yes</td></tr>
+        <tr><td>84%</td><td>72%</td><td>90%</td><td>&minus;12 to +6</td><td>Yes</td></tr>
+        <tr><td>85%</td><td>73%</td><td>90%</td><td>&minus;12 to +5</td><td>Yes</td></tr>
+        <tr><td>87%</td><td>75%</td><td>90%</td><td>&minus;12 to +3</td><td>Yes</td></tr>
+        <tr><td>88%</td><td>76%</td><td>90%</td><td>&minus;12 to +2</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub-section">
+    <h3>Weak Conditions <span style="font-weight:400; color:#6b7280;">(all 4 gender &times; outcome cells share identical structure)</span></h3>
+    <table>
+      <thead>
+        <tr>
+          <th>D1 Display</th>
+          <th>D2 Min</th>
+          <th>D2 Max</th>
+          <th>Possible Delta</th>
+          <th>Always "unsure / low conf"</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>12%</td><td>10%</td><td>24%</td><td>&minus;2 to +12</td><td>Yes</td></tr>
+        <tr><td>13%</td><td>10%</td><td>25%</td><td>&minus;3 to +12</td><td>Yes</td></tr>
+        <tr><td>15%</td><td>10%</td><td>27%</td><td>&minus;5 to +12</td><td>Yes</td></tr>
+        <tr><td>16%</td><td>10%</td><td>28%</td><td>&minus;6 to +12</td><td>Yes</td></tr>
+        <tr><td>18%</td><td>10%</td><td>30%</td><td>&minus;8 to +12</td><td>Yes</td></tr>
+        <tr><td>20%</td><td>10%</td><td>32%</td><td>&minus;10 to +12</td><td>Yes</td></tr>
+        <tr><td>21%</td><td>10%</td><td>33%</td><td>&minus;11 to +12</td><td>Yes</td></tr>
+        <tr><td>23%</td><td>11%</td><td>35%</td><td>&minus;12 to +12</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    <em><strong>Symmetry:</strong> Strong average (82.8%) and Weak average (17.2%) are equidistant from the 50% midpoint (32.8 pts each). D2 display values never cross tercile boundaries, ensuring the qualitative confidence label remains constant between D1 and D2 within each participant.</em>
+  </div>
+
+  <div class="page-num">3 / 4</div>
+</div>
+
+<!-- ==================== PAGE 4 ==================== -->
+<div class="page">
+  <div class="page-header-line">
+    <h2>Key Design Notes</h2>
+    <p class="subtitle">Implementation details and design rationale</p>
+  </div>
+
+  <ul class="notes-list">
+    <li>
+      <strong>Display mapping:</strong> Raw endorsement strength <code>|slider - 50| &times; 2</code> is mapped to the 10&ndash;90 display range via <code>displayConfidence(raw) = round(10 + raw &times; 0.8)</code>. This avoids extreme values (0% or 100%) that could appear implausible.
+    </li>
+    <li>
+      <strong>Real endorser data:</strong> All endorser information is drawn from real Stage 2 responses (N = 197 endorsers, survey <code>SV_54rmw8wULxvqS46</code>). No fabricated endorsements are used.
+    </li>
+    <li>
+      <strong>Endorser selection:</strong> 64 unique endorsers selected (8 per cell), stratified to maximize D1 display spread within each cell while keeping all values within the target tercile.
+    </li>
+    <li>
+      <strong>D2 variance mechanism:</strong> D2 display = D1 display &plusmn; random(5..12), clamped to tercile boundaries [10&ndash;36] or [64&ndash;90]. This creates natural-looking variation between the two endorsements without changing the qualitative confidence label.
+    </li>
+    <li>
+      <strong>Comprehension checks:</strong> 5 questions presented before the decisions block. All must be answered correctly to advance. Participants who fail are looped back through the instructions.
+    </li>
+    <li>
+      <strong>Incentive scheme:</strong> $0.50 bank per decision. Participants wager 0&ndash;100% of the bank. Correct: <code>$0.50 + $0.50 &times; (wager/100)</code>. Incorrect: <code>$0.50 &minus; $0.50 &times; (wager/100)</code>. Range: $0.00 to $1.00 per decision.
+    </li>
+    <li>
+      <strong>Survey deployment:</strong> Active survey <code>SV_9Fj2oJ5lxuFUXAy</code> on Wharton Qualtrics (yul1 datacenter). Recruitment via Prolific.
+    </li>
+  </ul>
+
+  <div style="margin-top: 36px;">
+    <div class="desc-block">
+      <p style="font-size:9pt; color:#4b5563;">
+        <strong>DV (Dependent Variable):</strong> Change in wager from D1 to D3, i.e., <code>wager_D3 &minus; wager_D1</code>. Because D2 displays D1's endorsement strength (not D2's own), the displayed confidence is held constant across D1 and D3, yielding a clean trust-update measure that isolates the effect of outcome feedback.
+      </p>
+    </div>
+
+    <div class="desc-block" style="background:#f0fdf4; border-color:#bbf7d0;">
+      <p style="font-size:9pt; color:#166534;">
+        <strong>Research Questions:</strong><br>
+        RQ1: Does endorser gender affect trust updating after outcome feedback?<br>
+        RQ2: Does endorsement strength moderate the gender &times; outcome interaction?<br>
+        RQ3: Do participants show asymmetric updating (penalizing failure more than rewarding success)?
+      </p>
+    </div>
+  </div>
+
+  <div class="page-num">4 / 4</div>
+</div>
+
+</body>
+</html>
