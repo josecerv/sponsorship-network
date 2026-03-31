@@ -31,6 +31,15 @@ Behavioral experiment studying how evaluators update trust in endorsers across t
 - Real Q2 slider value still used for `favoredSide` (which candidate was endorsed)
 - Saved embedded data: `endorser_display_strength_q1`, `endorser_display_strength_q2`, `endorser_q2_variance_delta`
 
+## Comprehension Checks (5 questions)
+- **CQ1** (QID71): Task question — correct: "Logical-reasoning task" (choice 2)
+- **CQ2** (QID60): Bank amount — correct: "$0.50" (choice 2)
+- **CQ3** (QID61): Wager calculation — correct: "$0.75" (choice 2)
+- **CQ4** (QID62): Bonus calculation — correct: "The sum of both decisions" (choice 3)
+- **CQ5** (QID72): Comparison question — correct: "A randomly selected candidate" (choice 1)
+- **Screen-out:** cq_score < 5 (any wrong answer → EndSurvey). Participants can review instructions before answering.
+- Scoring JS in QID68 (hidden block `BL_2lQZ2IScV57zrOm`), gate branch `FL_cq_gate`
+
 ## 8 Experimental Conditions
 `{M,W}_{correct,incorrect}_{strong,weak}` — Gender × Accuracy × Endorsement Strength
 
@@ -39,14 +48,18 @@ Behavioral experiment studying how evaluators update trust in endorsers across t
 pilots/
   qualtrics_js/           # Active JS files pushed to Qualtrics
     stage3_qid3_combined.js    # D1: first endorsement + wager (all 8 conditions)
-    stage3_qid4_js.js          # D3: second endorsement + wager (Q2 constant strength)
+    stage3_qid4_js.js          # D3: second endorsement + wager (Q2 varied strength)
     stage3_qid5_js.js          # D2: outcome screen
     stage3_qid3_strong_only.js # D1 variant: strong conditions only (4 pools)
   scripts/                # Build/push scripts
     push_decisions_to_qualtrics.py
+    pull_and_clean.py           # Pull Qualtrics data + create clean CSV
   tests/                  # Playwright browser tests
     test_stage3_js.py
   output/                 # Data exports, generated files
+    pilot_analysis.Rmd          # Main analysis (RQ1-RQ3 + diagnostics)
+    study_data_clean.csv        # Analysis-ready dataset
+    raw_export_fresh.json       # Raw Qualtrics export
   old/                    # Archived pilot material (n100, n399, n400, n400_strong)
 ```
 

@@ -38,7 +38,10 @@ REFERENCE_STUDY_ID = "698c9b997845ec93ec16f692"
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 CANONICAL_CSV = SCRIPT_DIR / "protocol_spreadsheet.csv"
-DOWNLOADS_CSV = Path("/mnt/c/Users/jcerv/Downloads") / "Chow broad protocol spreadsheet - Jose.csv"
+if sys.platform == "win32":
+    DOWNLOADS_CSV = Path.home() / "Downloads" / "Chow broad protocol spreadsheet - Jose.csv"
+else:
+    DOWNLOADS_CSV = Path("/mnt/c/Users/jcerv/Downloads") / "Chow broad protocol spreadsheet - Jose.csv"
 
 # ── Study descriptions (internal_name → human-readable description) ────────
 # Add new entries here as new studies are created.
@@ -61,6 +64,25 @@ STUDY_DESCRIPTIONS = {
         "Stage 3 evaluator survey (N={places}). Ps evaluate endorser decisions "
         "and stake bonus. IV: endorser gender x correctness x strength (2x2x2). "
         "DV: stake percentage (0-100%)."
+    ),
+    "sponsorship evaluator pilot #1 (N=400)": (
+        "Stage 3 evaluator survey (N={places}). Ps evaluate endorser decisions "
+        "and wager $0.50 bank. IV: endorser gender x correctness x strength (2x2x2). "
+        "DV: wager percentage (0-100%)."
+    ),
+    "sponsorship evaluator pretest of instructions": (
+        "Comprehension pretest (N={places}). Ps read evaluator instructions and answer "
+        "5 comprehension checks. DV: comprehension score (0-5)."
+    ),
+    "sponsorship evaluator (new instructions pilot)": (
+        "Stage 3 evaluator pilot with revised instructions (N={places}). Ps evaluate "
+        "endorser decisions and wager $0.50 bank. IV: endorser gender x correctness x "
+        "strength (2x2x2). DV: wager percentage (0-100%)."
+    ),
+    "sponsorship evaluator (new instructions N=400)": (
+        "Stage 3 evaluator survey with revised instructions (N={places}). Ps evaluate "
+        "endorser decisions and wager $0.50 bank. IV: endorser gender x correctness x "
+        "strength (2x2x2). DV: wager percentage (0-100%)."
     ),
 }
 
@@ -114,7 +136,8 @@ def fmt_date(iso_str: str | None) -> str:
     if not iso_str:
         return ""
     dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
-    return dt.strftime("%-d %b %Y")
+    fmt = "%#d %b %Y" if sys.platform == "win32" else "%-d %b %Y"
+    return dt.strftime(fmt)
 
 
 def fmt_time_min(est_min: int | None, avg_sec: int | None) -> str:

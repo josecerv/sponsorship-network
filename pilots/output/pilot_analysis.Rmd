@@ -1,0 +1,545 @@
+---
+title: "Sponsorship Network — Main Pilot Analysis"
+subtitle: "Survey SV_9Fj2oJ5lxuFUXAy (March 2026)"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(
+  echo = FALSE, message = FALSE, warning = FALSE,
+  fig.width = 10, fig.height = 5.5, fig.pos = "H"
+)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+library(car)
+library(broom)
+library(gridExtra)
+library(patchwork)
+
+NAVY <- "#011F5B"
+RED  <- "#990000"
+set.seed(42)
+```
+
+```{r load-data}
+d <- read.csv("study_data_clean.csv", stringsAsFactors = FALSE) %>%
+  mutate(
+    endorser_gender_f = factor(endorser_gender, levels = c("Male", "Female")),
+    outcome_f = factor(outcome, levels = c("Failure", "Success")),
+    strength_f = factor(strength_cond, levels = c("weak", "strong")),
+    trust_change = as.numeric(trust_change)
+  )
+
+# Two subsamples (all completers passed 5/5 CQ by design)
+s1 <- d                                           # Full (all passed CQ gate)
+s2 <- d %>% filter(manip_correct == 1)             # + manipulation check pass
+
+samples <- list(
+  list(data = s1, label = sprintf("Full Sample (N = %d)", nrow(s1))),
+  list(data = s2, label = sprintf("Manip Pass (N = %d)", nrow(s2)))
+)
+```
+
+\newpage
+
+# Sample Overview
+
+All completers passed the 5/5 comprehension check gate before entering the experiment.
+
+```{r sample-overview}
+overview <- function(dat, label) {
+  tibble(
+    Sample = label, N = nrow(dat),
+    `Mean D1` = mean(dat$trust_d1, na.rm = TRUE),
+    `Mean D2` = mean(dat$trust_d2, na.rm = TRUE),
+    `Mean Change` = mean(dat$trust_change, na.rm = TRUE),
+    `SD Change` = sd(dat$trust_change, na.rm = TRUE),
+    `No Change %` = mean(dat$trust_change == 0, na.rm = TRUE) * 100
+  )
+}
+
+bind_rows(
+  overview(s1, "Full (5/5 CQ)"),
+  overview(s2, "Manip Pass")
+) %>%
+  kable(digits = 1, caption = "DV descriptives by sample", booktabs = TRUE)
+```
+
+```{r condition-balance}
+d %>%
+  count(assigned_condition, endorser_gender, strength_cond, outcome) %>%
+  kable(caption = "N by condition", booktabs = TRUE)
+```
+
+```{r demographics}
+if (any(!is.na(d$age))) {
+  demo <- d %>%
+    summarise(
+      `Mean Age` = mean(age, na.rm = TRUE),
+      `SD Age` = sd(age, na.rm = TRUE),
+      `N Female` = sum(participant_gender == "Female", na.rm = TRUE),
+      `N Male` = sum(participant_gender == "Male", na.rm = TRUE),
+      `N Other/NB` = sum(!participant_gender %in% c("Female", "Male"), na.rm = TRUE)
+    )
+  kable(demo, digits = 1, caption = "Participant demographics", booktabs = TRUE)
+}
+```
+
+```{r display-strength-summary}
+if (any(!is.na(d$display_strength_q1))) {
+  ds <- d %>%
+    summarise(
+      `Q1 Display Mean` = mean(display_strength_q1, na.rm = TRUE),
+      `Q1 Display SD` = sd(display_strength_q1, na.rm = TRUE),
+      `Q2 Display Mean` = mean(display_strength_q2, na.rm = TRUE),
+      `Q2 Display SD` = sd(display_strength_q2, na.rm = TRUE),
+      `Delta Mean` = mean(q2_variance_delta, na.rm = TRUE),
+      `Delta SD` = sd(q2_variance_delta, na.rm = TRUE)
+    )
+  kable(ds, digits = 1, caption = "Display strength (10-90 scale)", booktabs = TRUE)
+}
+```
+
+```{r manip-check}
+d %>%
+  count(manip_correct, manip_missing) %>%
+  kable(caption = "Manipulation check (endorser gender recall)", booktabs = TRUE)
+```
+
+```{r reaction-times}
+rt <- d %>%
+  summarise(
+    `D1 Median RT (s)` = median(rt_d1, na.rm = TRUE),
+    `D2 Median RT (s)` = median(rt_d2, na.rm = TRUE),
+    `Outcome Median RT (s)` = median(rt_outcome, na.rm = TRUE),
+    `D1 Mean RT (s)` = mean(rt_d1, na.rm = TRUE),
+    `D2 Mean RT (s)` = mean(rt_d2, na.rm = TRUE),
+    `Duration Median (s)` = median(duration_s, na.rm = TRUE)
+  )
+kable(rt, digits = 1, caption = "Reaction times", booktabs = TRUE)
+```
+
+```{r dv-distribution, fig.height=8, fig.width=11, fig.cap="Distribution of Trust Change by Strength x Outcome"}
+hist_facet <- function(dat, label) {
+  cell_means <- dat %>%
+    group_by(strength_f, outcome_f) %>%
+    summarise(m = mean(trust_change), n = n(), .groups = "drop")
+
+  ggplot(dat, aes(x = trust_change)) +
+    geom_histogram(binwidth = 5, fill = NAVY, color = "white", alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
+    geom_vline(data = cell_means, aes(xintercept = m),
+               linetype = "solid", color = RED, linewidth = 0.8) +
+    geom_text(data = cell_means, aes(x = m, y = Inf,
+              label = sprintf("M=%.1f (n=%d)", m, n)),
+              vjust = 1.5, hjust = -0.05, color = RED, fontface = "bold", size = 3) +
+    facet_grid(strength_f ~ outcome_f,
+               labeller = labeller(
+                 strength_f = c("weak" = "Weak Endorser", "strong" = "Strong Endorser"),
+                 outcome_f = c("Failure" = "Failure", "Success" = "Success"))) +
+    labs(title = label, x = "Trust Change (D2 - D1)", y = "Count") +
+    theme_bw() +
+    theme(plot.title = element_text(size = 12, face = "bold"),
+          strip.text = element_text(size = 11, face = "bold"))
+}
+
+hist_facet(s1, sprintf("Full Sample (N = %d)", nrow(s1)))
+```
+
+\newpage
+
+# RQ1: Gender $\times$ Outcome on Trust Change
+
+Does endorser gender moderate how evaluators respond to outcome feedback?
+
+$$\text{TrustChange}_i = \beta_0 + \beta_1\text{Female} + \beta_2\text{Success} + \beta_3(\text{Female} \times \text{Success}) + \varepsilon_i$$
+
+```{r rq1-plot-fn}
+plot_rq1 <- function(dat, title_label) {
+  pd <- dat %>%
+    group_by(endorser_gender_f, outcome_f) %>%
+    summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
+              n = n(), .groups = "drop") %>%
+    mutate(
+      ci_hi = m + 1.96 * se,
+      ci_lo = m - 1.96 * se,
+      label_y = ifelse(m >= 0, ci_hi + 1, ci_lo - 1),
+      label_vjust = ifelse(m >= 0, 0, 1)
+    )
+
+  y_max <- max(pd$ci_hi) + 10
+  y_min <- min(pd$ci_lo) - 10
+
+  ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                  position = position_dodge(0.8), width = 0.25) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_text(aes(y = label_y, label = sprintf("%.1f (n=%d)", m, n),
+                  vjust = label_vjust),
+              position = position_dodge(0.8),
+              size = 3.5, fontface = "bold") +
+    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    coord_cartesian(ylim = c(y_min, y_max)) +
+    labs(title = title_label, x = "D1 Outcome",
+         y = "Trust Change (D2 - D1)", fill = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 13))
+}
+```
+
+## Full Sample (N = `r nrow(s1)`)
+
+```{r rq1-fig-full, fig.height=5, fig.cap="RQ1: Full Sample"}
+plot_rq1(s1, sprintf("RQ1: Gender x Outcome — Full Sample (N = %d)", nrow(s1)))
+```
+
+```{r rq1-reg-full, results='markup'}
+summary(lm(trust_change ~ endorser_gender_f * outcome_f, data = s1))
+```
+
+\newpage
+
+## Manip Pass (N = `r nrow(s2)`)
+
+```{r rq1-fig-manip, fig.height=5, fig.cap="RQ1: Manip Pass"}
+plot_rq1(s2, sprintf("RQ1: Gender x Outcome — Manip Pass (N = %d)", nrow(s2)))
+```
+
+```{r rq1-reg-manip, results='markup'}
+summary(lm(trust_change ~ endorser_gender_f * outcome_f, data = s2))
+```
+
+\newpage
+
+## RQ1 Summary
+
+```{r rq1-summary}
+rq1_row <- function(dat, label) {
+  m <- lm(trust_change ~ endorser_gender_f * outcome_f, data = dat)
+  cs <- summary(m)$coefficients
+  ix_row <- "endorser_gender_fFemale:outcome_fSuccess"
+  mf <- mean(dat$trust_change[dat$endorser_gender == "Male" & dat$outcome == "Failure"])
+  ms <- mean(dat$trust_change[dat$endorser_gender == "Male" & dat$outcome == "Success"])
+  ff <- mean(dat$trust_change[dat$endorser_gender == "Female" & dat$outcome == "Failure"])
+  fs <- mean(dat$trust_change[dat$endorser_gender == "Female" & dat$outcome == "Success"])
+  tibble(
+    Sample = label, N = nrow(dat),
+    `Male Fail` = mf, `Male Suc` = ms, `Male Range` = ms - mf,
+    `Fem Fail` = ff, `Fem Suc` = fs, `Fem Range` = fs - ff,
+    `Interaction b` = cs[ix_row, "Estimate"],
+    `p` = cs[ix_row, "Pr(>|t|)"],
+    `d` = cs[ix_row, "Estimate"] / sd(dat$trust_change)
+  )
+}
+
+# Only compute if both genders and both outcomes present
+if (length(unique(s1$endorser_gender)) > 1 && length(unique(s1$outcome)) > 1) {
+  bind_rows(
+    rq1_row(s1, "Full"),
+    rq1_row(s2, "Manip Pass")
+  ) %>%
+    kable(digits = c(0, 0, 1, 1, 1, 1, 1, 1, 2, 3, 3),
+          caption = "RQ1: Gender x Outcome across samples", booktabs = TRUE)
+} else {
+  cat("Insufficient cell coverage to compute RQ1 summary table.")
+}
+```
+
+\newpage
+
+# RQ2: Gender $\times$ Strength $\times$ Outcome on Trust Change
+
+Does endorser confidence moderate the gender effect on trust updating?
+
+$$\text{TrustChange}_i = \beta_0 + \beta_1 F + \beta_2 S + \beta_3 O + \beta_4(F \times S) + \beta_5(F \times O) + \beta_6(S \times O) + \beta_7(F \times S \times O) + \varepsilon_i$$
+
+```{r rq2-plot-fn}
+plot_rq2 <- function(dat, title_label) {
+  pd <- dat %>%
+    group_by(endorser_gender_f, outcome_f, strength_f) %>%
+    summarise(m = mean(trust_change), se = sd(trust_change) / sqrt(n()),
+              n = n(), .groups = "drop") %>%
+    mutate(
+      ci_hi = m + 1.96 * se,
+      ci_lo = m - 1.96 * se,
+      label_y = ifelse(m >= 0, ci_hi + 1, ci_lo - 1),
+      label_vjust = ifelse(m >= 0, 0, 1)
+    )
+
+  y_max <- max(pd$ci_hi) + 8
+  y_min <- min(pd$ci_lo) - 8
+
+  ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                  position = position_dodge(0.8), width = 0.25) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_text(aes(y = label_y, label = sprintf("%.1f (n=%d)", m, n),
+                  vjust = label_vjust),
+              position = position_dodge(0.8),
+              size = 3, fontface = "bold") +
+    facet_wrap(~ strength_f, nrow = 1,
+               labeller = labeller(strength_f = c("weak" = "Weak Endorser",
+                                                   "strong" = "Strong Endorser"))) +
+    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    coord_cartesian(ylim = c(y_min, y_max)) +
+    labs(title = title_label, x = "D1 Outcome",
+         y = "Trust Change (D2 - D1)", fill = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(size = 14, face = "bold"),
+          strip.text = element_text(size = 13, face = "bold"),
+          axis.text = element_text(size = 11),
+          axis.title = element_text(size = 13))
+}
+```
+
+## Full Sample (N = `r nrow(s1)`)
+
+```{r rq2-fig-full, fig.height=5, fig.width=12, fig.cap="RQ2: Full Sample"}
+plot_rq2(s1, sprintf("RQ2: Gender x Strength x Outcome — Full Sample (N = %d)", nrow(s1)))
+```
+
+```{r rq2-reg-full, results='markup'}
+summary(lm(trust_change ~ endorser_gender_f * strength_f * outcome_f, data = s1))
+```
+
+\newpage
+
+## Manip Pass (N = `r nrow(s2)`)
+
+```{r rq2-fig-manip, fig.height=5, fig.width=12, fig.cap="RQ2: Manip Pass"}
+plot_rq2(s2, sprintf("RQ2: Gender x Strength x Outcome — Manip Pass (N = %d)", nrow(s2)))
+```
+
+```{r rq2-reg-manip, results='markup'}
+summary(lm(trust_change ~ endorser_gender_f * strength_f * outcome_f, data = s2))
+```
+
+\newpage
+
+## RQ2 Summary: Outcome Range by Gender $\times$ Strength
+
+```{r rq2-summary}
+rq2_row <- function(dat, label) {
+  cells <- dat %>%
+    group_by(endorser_gender_f, strength_f, outcome_f) %>%
+    summarise(m = mean(trust_change), n = n(), .groups = "drop") %>%
+    pivot_wider(names_from = outcome_f, values_from = c(m, n))
+
+  cells %>%
+    mutate(Sample = label, Range = m_Success - m_Failure) %>%
+    select(Sample, Gender = endorser_gender_f, Strength = strength_f,
+           Failure = m_Failure, `n Fail` = n_Failure,
+           Success = m_Success, `n Suc` = n_Success, Range)
+}
+
+if (length(unique(paste(s1$endorser_gender, s1$strength_cond, s1$outcome))) >= 4) {
+  bind_rows(
+    rq2_row(s1, "Full"),
+    rq2_row(s2, "Manip Pass")
+  ) %>%
+    kable(digits = 1,
+          caption = "RQ2: Outcome range (Success - Failure) by Gender x Strength",
+          booktabs = TRUE)
+} else {
+  cat("Insufficient cell coverage for RQ2 summary table.")
+}
+```
+
+\newpage
+
+# RQ3: Initial Trust by Gender $\times$ Strength
+
+Do evaluators extend different levels of initial trust to male versus female endorsers?
+
+$$\text{D1 Wager}_i = \beta_0 + \beta_1\text{Female} + \beta_2\text{Strong} + \beta_3(\text{Female} \times \text{Strong}) + \varepsilon_i$$
+
+```{r rq3-plot-fn}
+plot_rq3 <- function(dat, title_label) {
+  pd <- dat %>%
+    group_by(endorser_gender_f, strength_f) %>%
+    summarise(m = mean(trust_d1), se = sd(trust_d1) / sqrt(n()),
+              n = n(), .groups = "drop") %>%
+    mutate(ci_hi = m + 1.96 * se, ci_lo = m - 1.96 * se)
+
+  y_max <- max(pd$ci_hi) + 10
+
+  ggplot(pd, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
+    geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                  position = position_dodge(0.8), width = 0.25) +
+    geom_text(aes(y = ci_hi + 1, label = sprintf("%.1f (n=%d)", m, n)),
+              position = position_dodge(0.8), vjust = 0,
+              size = 3.5, fontface = "bold") +
+    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    scale_x_discrete(labels = c("weak" = "Weak Endorser", "strong" = "Strong Endorser")) +
+    coord_cartesian(ylim = c(0, y_max)) +
+    labs(title = title_label, x = "Endorsement Strength",
+         y = "Initial Wager (D1)", fill = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(size = 14, face = "bold"),
+          axis.text = element_text(size = 12),
+          axis.title = element_text(size = 13))
+}
+```
+
+## Full Sample (N = `r nrow(s1)`)
+
+```{r rq3-fig-full, fig.height=5, fig.cap="RQ3: Full Sample"}
+plot_rq3(s1, sprintf("RQ3: Initial Trust — Full Sample (N = %d)", nrow(s1)))
+```
+
+```{r rq3-reg-full, results='markup'}
+summary(lm(trust_d1 ~ endorser_gender_f * strength_f, data = s1))
+```
+
+\newpage
+
+## Manip Pass (N = `r nrow(s2)`)
+
+```{r rq3-fig-manip, fig.height=5, fig.cap="RQ3: Manip Pass"}
+plot_rq3(s2, sprintf("RQ3: Initial Trust — Manip Pass (N = %d)", nrow(s2)))
+```
+
+```{r rq3-reg-manip, results='markup'}
+summary(lm(trust_d1 ~ endorser_gender_f * strength_f, data = s2))
+```
+
+\newpage
+
+## RQ3 Summary
+
+```{r rq3-summary}
+rq3_row <- function(dat, label) {
+  mw <- mean(dat$trust_d1[dat$endorser_gender == "Male" & dat$strength_cond == "weak"], na.rm = TRUE)
+  ms <- mean(dat$trust_d1[dat$endorser_gender == "Male" & dat$strength_cond == "strong"], na.rm = TRUE)
+  fw <- mean(dat$trust_d1[dat$endorser_gender == "Female" & dat$strength_cond == "weak"], na.rm = TRUE)
+  fs <- mean(dat$trust_d1[dat$endorser_gender == "Female" & dat$strength_cond == "strong"], na.rm = TRUE)
+
+  m <- lm(trust_d1 ~ endorser_gender_f * strength_f, data = dat)
+  cs <- summary(m)$coefficients
+  tibble(
+    Sample = label, N = nrow(dat),
+    `M Weak` = mw, `M Strong` = ms, `M Diff` = ms - mw,
+    `F Weak` = fw, `F Strong` = fs, `F Diff` = fs - fw,
+    `Female b` = cs["endorser_gender_fFemale", "Estimate"],
+    `Female p` = cs["endorser_gender_fFemale", "Pr(>|t|)"],
+    `G x S b` = cs["endorser_gender_fFemale:strength_fstrong", "Estimate"],
+    `G x S p` = cs["endorser_gender_fFemale:strength_fstrong", "Pr(>|t|)"]
+  )
+}
+
+if (length(unique(paste(s1$endorser_gender, s1$strength_cond))) >= 4) {
+  bind_rows(
+    rq3_row(s1, "Full"),
+    rq3_row(s2, "Manip Pass")
+  ) %>%
+    kable(digits = c(0, 0, 1, 1, 1, 1, 1, 1, 2, 3, 2, 3),
+          caption = "RQ3: Initial trust (D1 wager) by Gender x Strength",
+          booktabs = TRUE)
+} else {
+  cat("Insufficient cell coverage for RQ3 summary table.")
+}
+```
+
+\newpage
+
+# RQ4: Q2 Varied Strength and Trust Updating
+
+Does the Q2 display strength variance (within-tercile jitter) affect trust updating?
+
+```{r rq4-strength-scatter, fig.height=5, fig.cap="Trust Change vs Q2 Display Strength"}
+if (any(!is.na(d$display_strength_q2))) {
+  ggplot(d, aes(x = display_strength_q2, y = trust_change, color = endorser_gender_f)) +
+    geom_point(size = 3, alpha = 0.7) +
+    geom_smooth(method = "lm", se = TRUE, alpha = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    scale_color_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    facet_wrap(~ outcome_f) +
+    labs(title = "Trust Change vs Q2 Display Strength",
+         x = "Q2 Display Strength (10-90)", y = "Trust Change (D2 - D1)",
+         color = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom")
+} else {
+  cat("Q2 display strength data not yet available (embedded data fields were just added).")
+}
+```
+
+```{r rq4-delta-scatter, fig.height=5, fig.cap="Trust Change vs Q2 Variance Delta"}
+if (any(!is.na(d$q2_variance_delta))) {
+  ggplot(d, aes(x = q2_variance_delta, y = trust_change, color = endorser_gender_f)) +
+    geom_point(size = 3, alpha = 0.7) +
+    geom_smooth(method = "lm", se = TRUE, alpha = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "gray70") +
+    scale_color_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    labs(title = "Trust Change vs Q2 Strength Delta (Q2 - Q1)",
+         x = "Q2 - Q1 Display Strength", y = "Trust Change (D2 - D1)",
+         color = "Endorser Gender") +
+    theme_bw() +
+    theme(legend.position = "bottom")
+} else {
+  cat("Q2 variance delta data not yet available.")
+}
+```
+
+\newpage
+
+# Data Quality Diagnostics
+
+```{r quality-speeders, fig.height=4, fig.cap="Survey Duration Distribution"}
+if (any(!is.na(d$duration_s))) {
+  ggplot(d, aes(x = duration_s / 60)) +
+    geom_histogram(binwidth = 1, fill = NAVY, color = "white", alpha = 0.8) +
+    geom_vline(xintercept = median(d$duration_s, na.rm = TRUE) / 60,
+               color = RED, linewidth = 1) +
+    labs(title = "Survey Duration", x = "Minutes", y = "Count") +
+    theme_bw()
+}
+```
+
+```{r quality-anchoring, fig.height=5, fig.cap="D1 vs D2 Wager (anchoring check)"}
+ggplot(d, aes(x = trust_d1, y = trust_d2, color = outcome_f)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50") +
+  scale_color_manual(values = c("Failure" = RED, "Success" = NAVY)) +
+  facet_wrap(~ endorser_gender_f) +
+  labs(title = "D1 vs D2 Wager by Outcome and Gender",
+       x = "D1 Wager", y = "D2 Wager", color = "Outcome") +
+  coord_cartesian(xlim = c(0, 100), ylim = c(0, 100)) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+```{r quality-no-change}
+no_change <- d %>%
+  group_by(assigned_condition) %>%
+  summarise(
+    N = n(),
+    `No Change` = sum(trust_change == 0),
+    `% No Change` = mean(trust_change == 0) * 100,
+    .groups = "drop"
+  )
+kable(no_change, digits = 1, caption = "No-change responses by condition", booktabs = TRUE)
+```

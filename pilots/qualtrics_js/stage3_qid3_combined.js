@@ -205,9 +205,13 @@ Qualtrics.SurveyEngine.addOnReady(function () {
   var endorserGender, eVal, trial;
 
   if (!endorserId) {
-    // First page in block: assign condition from CONDITION_POOLS
-    var condKeys = Object.keys(CONDITION_POOLS);
-    var assignedCond = condKeys[Math.floor(Math.random() * condKeys.length)];
+    // First page in block: read condition from Survey Flow randomizer (EvenPresentation)
+    // Fallback to random if not pre-assigned (e.g., preview mode)
+    var assignedCond = Qualtrics.SurveyEngine.getEmbeddedData('assigned_condition');
+    if (!assignedCond || !CONDITION_POOLS[assignedCond]) {
+      var condKeys = Object.keys(CONDITION_POOLS);
+      assignedCond = condKeys[Math.floor(Math.random() * condKeys.length)];
+    }
     var pool = CONDITION_POOLS[assignedCond];
     var selected = pool[Math.floor(Math.random() * pool.length)];
 

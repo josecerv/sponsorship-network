@@ -38,7 +38,11 @@ Prolific reports all costs in GBP pence. The spreadsheet displays these as dolla
 | `698c9d4824381d13bc0dc48a` | Sponsor evaluator gender manipulation check | Gender manip check |
 | `698cc633b8e938f1afa96e29` | sponsorship evaluation (time estimate pilot) | Stage 2 main (N=200) |
 | `698df2d1ef3b06cdc3c49ca3` | sponsorship evaluator survey (time estimate pilot) | Stage 3 pilot (N=25) |
-| `698e27db580428e78f8e9ff1` | sponsorship evaluator pilot #1 (N=100) | Stage 3 main (N=100) |
+| `698e27db580428e78f8e9ff1` | sponsorship evaluator pilot #1 (N=100) | Stage 3 pilot (N=100) |
+| `699503492f16351efc6be595` | sponsorship evaluator pilot #1 (N=400) | Stage 3 main (N=400) |
+| `69b03ce82fe9a48622701437` | sponsorship evaluator pretest of instructions | Instructions pretest (N=34) |
+| `69b40b850c4cd6cd75d539d2` | sponsorship evaluator (new instructions pilot) | Stage 3 new instructions pilot (N=30) |
+| `69b416034cf8f370e3d1d5e8` | sponsorship evaluator (new instructions N=400) | Stage 3 new instructions (N=400) |
 
 ## Qualtrics survey IDs
 
