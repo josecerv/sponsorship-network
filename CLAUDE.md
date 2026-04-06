@@ -74,3 +74,30 @@ Requires: `pip install playwright && playwright install chromium`
 python pilots/scripts/push_decisions_to_qualtrics.py
 ```
 Updates QuestionText (HTML) and QuestionJS for QID3, QID4, QID5 via Qualtrics API.
+
+## Talk Deck Pipeline (UChicago — April 10, 2026)
+
+**Deliverable:** `docs/UChicago-0410.pptx` (21 slides). First draft built 2026-04-06; needs further edits.
+
+**Build pipeline (4 scripts, run in order):**
+```bash
+PYTHONIOENCODING=utf-8 python pilots/scripts/render_stage3_screens.py --mode both
+PYTHONIOENCODING=utf-8 python pilots/scripts/render_hook_card.py
+"/c/Program Files/R/R-4.5.2/bin/Rscript.exe" pilots/scripts/make_talk_figures.R
+PYTHONIOENCODING=utf-8 python pilots/scripts/build_uchicago_deck.py
+```
+
+**Visual verification (LibreOffice → PDF → per-slide PNG previews):**
+```bash
+"/c/Program Files/LibreOffice/program/soffice.exe" --headless --convert-to pdf \
+  --outdir pilots/output/deck_preview docs/UChicago-0410.pptx
+```
+Then re-render `pilots/output/deck_preview/pages/slide{01..21}.png` via `pypdfium2`.
+
+**Hard rules for any future edit:**
+- The Stage 3 screen renderer **always refetches the live Qualtrics survey via API** by default. The on-disk `survey_*_definition.json` is a stale cache; trust live, not local.
+- **No Chrome/Chromium for HTML→image rendering.** Use Playwright Firefox (already installed). The legacy `pilots/scripts/generate_condition_stimuli.py` uses Chromium and is a hand-rolled HTML mock-up — it is **deprecated**, do not call it from the talk pipeline.
+- All slide content lives in `pilots/scripts/build_uchicago_deck.py` as per-slide functions (`slide_01_hook`, `slide_02_what_is_sponsorship`, …, `slide_21_thanks`). Edit those, then re-run the build. Do not hand-edit the .pptx in PowerPoint and expect to re-run the script — the script is the source of truth.
+- The synthesis slide (slide 18) explicitly says the new pilot does NOT replicate the old "women punished more harshly" pattern; instead it shows men's endorsements get updated against more in BOTH directions. This honest framing flip is intentional — don't undo it without explicit go-ahead.
+
+Full handoff context (slide map, knobs, locked decisions, pilot numbers) is in the auto-memory file `project_uchicago_talk.md`.
