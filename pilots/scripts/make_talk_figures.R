@@ -1,16 +1,17 @@
 #!/usr/bin/env Rscript
 # ============================================================
-# make_talk_figures.R
+# make_talk_figures.R  (v2 — slide-fill cleanup)
 # ------------------------------------------------------------
-# Produces talk-quality versions of the RQ1, RQ2, RQ3 figures
-# from the n=403 pilot.
+# Builds slide-quality figures for the UChicago deck.
 #
-# Design philosophy:
-#   - Bars get the most real estate; stats live in subtitle/caption
-#   - Larger output PNGs for slide-filling embedding
-#   - Separate strong-only / weak-only RQ2 panels for build-style animation
-#
-# Output: pilots/output/talk_figures/{rq1,rq2,rq3}_*.png
+# Design goals (per Jose 2026-04-06):
+#   - Bars dominate. No in-figure title/subtitle/caption (slide handles those).
+#   - Order: Success on the left, Failure on the right.
+#   - Bigger bars, bigger text, less whitespace.
+#   - Cell means above bars (no n labels).
+#   - Stats (b, p, deltas) get pulled into the python-pptx slide as a
+#     top-right corner annotation, NOT in the figure.
+#   - Wide 16x7.5" output so the figure can sit near full-bleed in the slide.
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -46,6 +47,9 @@ cat("Reading", data_csv, "\n")
 d_all <- read.csv(data_csv, stringsAsFactors = FALSE)
 
 # ---- Manip-pass only ----
+# NOTE: factor levels for outcome stay c("Failure","Success") so the
+# regression interaction term keeps its existing reference. Display order
+# is overridden via scale_x_discrete(limits=...) below.
 d <- d_all |>
   filter(manip_correct == 1) |>
   mutate(
@@ -87,7 +91,6 @@ cohens_d_gender_outcome_interaction <- function(df) {
        d_interaction = d_int, pooled_sd = pooled_sd)
 }
 
-# Pull regression coefficients (with controls) for the interaction
 fit_interaction <- function(df) {
   m <- lm(trust_change ~ endorser_gender_f * outcome_f + q2_variance_delta + p_female, data = df)
   s <- summary(m)$coefficients
@@ -97,37 +100,64 @@ fit_interaction <- function(df) {
        n = nrow(df))
 }
 
-# ---- Theme: oversized for slides ----
-talk_theme <- theme_bw(base_size = 22) +
+# ---- Slide-fill talk theme ----
+talk_theme_v2 <- theme_bw(base_size = 24) +
   theme(
-    plot.title          = element_text(face = "bold", size = 30, hjust = 0,
-                                        margin = margin(b = 4)),
-    plot.subtitle       = element_text(size = 22, color = "gray25", hjust = 0,
-                                        margin = margin(b = 14)),
-    plot.caption        = element_text(size = 16, color = "gray45", hjust = 0,
-                                        margin = margin(t = 12)),
-    plot.margin         = margin(20, 30, 18, 22),
-    axis.title.x        = element_text(face = "bold", size = 22, margin = margin(t = 10)),
-    axis.title.y        = element_text(face = "bold", size = 22, margin = margin(r = 10)),
-    axis.text           = element_text(size = 20, color = "gray15"),
-    legend.position     = "bottom",
-    legend.title        = element_text(face = "bold", size = 22),
-    legend.text         = element_text(size = 22),
-    legend.key.size     = unit(1.4, "lines"),
-    strip.text          = element_text(face = "bold", size = 26),
-    strip.background    = element_rect(fill = "#F5F7FA", color = "gray70"),
+    plot.title          = element_blank(),
+    plot.subtitle       = element_blank(),
+    plot.caption        = element_blank(),
+    plot.margin         = margin(28, 36, 18, 26),
+    axis.title.x        = element_blank(),
+    axis.title.y        = element_text(face = "bold", size = 28, margin = margin(r = 16)),
+    axis.text.x         = element_text(size = 36, color = "gray10", face = "bold",
+                                       margin = margin(t = 8)),
+    axis.text.y         = element_text(size = 24, color = "gray20"),
+    legend.position     = "top",
+    legend.justification = "center",
+    legend.title        = element_blank(),
+    legend.text         = element_text(face = "bold", size = 28),
+    legend.key.size     = unit(1.8, "lines"),
+    legend.margin       = margin(0, 0, 12, 0),
+    legend.box.margin   = margin(0, 0, 0, 0),
     panel.grid.minor    = element_blank(),
     panel.grid.major.x  = element_blank()
   )
 
-# Reusable bar-chart geometry: bigger bars, bigger labels
-bar_geom <- function() {
+# Reusable bar geometry — bigger bars, thicker error bars
+bar_geom_v2 <- function() {
   list(
-    geom_bar(stat = "identity", position = position_dodge(0.85), width = 0.78),
+    geom_bar(stat = "identity", position = position_dodge(0.92), width = 0.85),
     geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
-                  position = position_dodge(0.85), width = 0.22, linewidth = 0.9),
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", linewidth = 0.6)
+                  position = position_dodge(0.92), width = 0.18, linewidth = 1.4),
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", linewidth = 0.8)
   )
+}
+
+# Build a generic outcome-axis figure (RQ1, RQ2 strong, RQ2 weak)
+build_outcome_figure <- function(pd, fname, ymin, ymax) {
+  pd <- pd |>
+    mutate(
+      label_y     = ifelse(m >= 0, ci_hi + (ymax - ymin) * 0.04,
+                                   ci_lo - (ymax - ymin) * 0.04),
+      label_vjust = ifelse(m >= 0, 0, 1)
+    )
+
+  p <- ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
+    bar_geom_v2() +
+    geom_text(aes(y = label_y,
+                  label = sprintf("%+.1f", m),
+                  vjust = label_vjust),
+              position = position_dodge(0.92), size = 13, fontface = "bold") +
+    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+    # SUCCESS LEFT, FAILURE RIGHT (overrides factor order, regression unchanged)
+    scale_x_discrete(limits = c("Success", "Failure")) +
+    coord_cartesian(ylim = c(ymin, ymax)) +
+    labs(x = NULL, y = "Trust update") +
+    talk_theme_v2
+
+  ggsave(file.path(out_dir, fname),
+         plot = p, width = 15, height = 6, dpi = 240, bg = "white")
+  cat("  ->", file.path(out_dir, fname), "\n")
 }
 
 # ============================================================
@@ -135,68 +165,26 @@ bar_geom <- function() {
 # ============================================================
 
 cat("\n[RQ1] Building gender x outcome figure...\n")
-pd1 <- cell_summary(d, endorser_gender_f, outcome_f) |>
-  mutate(
-    label_y     = ifelse(m >= 0, ci_hi + 1.6, ci_lo - 1.6),
-    label_vjust = ifelse(m >= 0, 0, 1)
-  )
+pd1 <- cell_summary(d, endorser_gender_f, outcome_f)
 
-eff1   <- cohens_d_gender_outcome_interaction(d)
-reg1   <- fit_interaction(d)
-cat(sprintf("  Delta_Male = %.2f, Delta_Female = %.2f, d(interaction) = %.3f\n",
+eff1 <- cohens_d_gender_outcome_interaction(d)
+reg1 <- fit_interaction(d)
+cat(sprintf("  Delta_Male = %+.2f, Delta_Female = %+.2f, d_int = %.3f\n",
             eff1$delta_male, eff1$delta_female, eff1$d_interaction))
-cat(sprintf("  Female x Success interaction: b = %+.2f, p = %.4f\n", reg1$b, reg1$p))
+cat(sprintf("  b = %+.2f, p = %.4f\n", reg1$b, reg1$p))
 
-fmt_p <- function(p) {
-  if (p < .001) return("p < .001")
-  return(sprintf("p = %.3f", p))
-}
-p_str1 <- fmt_p(reg1$p)
-
-subtitle1 <- bquote(
-  Delta[Male] == .(sprintf("%+.1f", eff1$delta_male)) ~ "  •  " ~
-  Delta[Female] == .(sprintf("%+.1f", eff1$delta_female)) ~ "  •  " ~
-  "Gender × Outcome:" ~ italic(b) == .(sprintf("%+.2f", reg1$b)) ~ "," ~ italic(.(p_str1))
-)
-
-ymax1 <- max(pd1$ci_hi) + 6
-ymin1 <- min(pd1$ci_lo) - 6
-
-p1 <- ggplot(pd1, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
-  bar_geom() +
-  geom_text(aes(y = label_y,
-                label = sprintf("%.1f\n(n=%d)", m, n),
-                vjust = label_vjust),
-            position = position_dodge(0.85), size = 7, fontface = "bold",
-            lineheight = 0.92) +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
-                    name = "Endorser Gender") +
-  coord_cartesian(ylim = c(ymin1, ymax1)) +
-  labs(
-    title    = "Trust update is much larger for male endorsers",
-    subtitle = subtitle1,
-    x        = "Outcome of the endorsement",
-    y        = "Trust change  (post-outcome − pre-outcome)",
-    caption  = sprintf("N = %d  ·  error bars = 95%% CI  ·  controls: Q2 variance + participant gender", N)
-  ) +
-  talk_theme
-
-ggsave(file.path(out_dir, "rq1_gender_x_outcome.png"),
-       plot = p1, width = 14, height = 8, dpi = 220, bg = "white")
-cat("  ->", file.path(out_dir, "rq1_gender_x_outcome.png"), "\n")
+# Use a common y-range across RQ1 / RQ2 cells so bars feel comparable
+ymin1 <- floor(min(pd1$ci_lo) - 6)
+ymax1 <- ceiling(max(pd1$ci_hi) + 8)
+build_outcome_figure(pd1, "rq1_gender_x_outcome.png", ymin1, ymax1)
 
 # ============================================================
-# RQ2: Gender x Outcome, faceted AND split into strong/weak
+# RQ2: Strong-only and Weak-only single panels (locked y-axis)
 # ============================================================
 
-cat("\n[RQ2] Building strength figures...\n")
-pd2 <- cell_summary(d, endorser_gender_f, outcome_f, strength_f) |>
-  mutate(
-    label_y     = ifelse(m >= 0, ci_hi + 1.8, ci_lo - 1.8),
-    label_vjust = ifelse(m >= 0, 0, 1)
-  )
+cat("\n[RQ2] Building strong/weak figures...\n")
+pd2 <- cell_summary(d, endorser_gender_f, outcome_f, strength_f)
 
-# Split data
 d_strong <- d |> filter(strength_cond == "strong")
 d_weak   <- d |> filter(strength_cond == "weak")
 eff2s <- cohens_d_gender_outcome_interaction(d_strong)
@@ -204,117 +192,28 @@ eff2w <- cohens_d_gender_outcome_interaction(d_weak)
 reg2s <- fit_interaction(d_strong)
 reg2w <- fit_interaction(d_weak)
 
-cat(sprintf("  STRONG: dM=%.2f dF=%.2f d_int=%.3f  b_int=%+.2f p=%.3f\n",
-            eff2s$delta_male, eff2s$delta_female, eff2s$d_interaction, reg2s$b, reg2s$p))
-cat(sprintf("  WEAK:   dM=%.2f dF=%.2f d_int=%.3f  b_int=%+.2f p=%.3f\n",
-            eff2w$delta_male, eff2w$delta_female, eff2w$d_interaction, reg2w$b, reg2w$p))
+cat(sprintf("  STRONG: dM=%+.2f dF=%+.2f d_int=%.3f  b=%+.2f p=%.3f\n",
+            eff2s$delta_male, eff2s$delta_female, eff2s$d_interaction,
+            reg2s$b, reg2s$p))
+cat(sprintf("  WEAK:   dM=%+.2f dF=%+.2f d_int=%.3f  b=%+.2f p=%.3f\n",
+            eff2w$delta_male, eff2w$delta_female, eff2w$d_interaction,
+            reg2w$b, reg2w$p))
 
-# Lock both panels to a common y-axis so they're visually comparable in animation
-common_ymax <- max(pd2$ci_hi) + 6
-common_ymin <- min(pd2$ci_lo) - 6
+# Common y range across both strong and weak panels
+common_ymin <- floor(min(pd2$ci_lo) - 6)
+common_ymax <- ceiling(max(pd2$ci_hi) + 8)
 
-# ---- RQ2 STRONG-only single panel ----
-pd2s <- pd2 |> filter(strength_f == "strong")
-
-p_str2s <- fmt_p(reg2s$p)
-
-subtitle2s <- bquote(
-  "Strong endorsers (n=" * .(reg2s$n) * "):  " ~
-  Delta[Male] == .(sprintf("%+.1f", eff2s$delta_male)) ~ "  •  " ~
-  Delta[Female] == .(sprintf("%+.1f", eff2s$delta_female)) ~ "  •  " ~
-  italic(b) == .(sprintf("%+.2f", reg2s$b)) ~ "," ~ italic(.(p_str2s))
+build_outcome_figure(
+  pd2 |> filter(strength_f == "strong"),
+  "rq2_strong_only.png", common_ymin, common_ymax
 )
-
-p2s <- ggplot(pd2s, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
-  bar_geom() +
-  geom_text(aes(y = label_y,
-                label = sprintf("%.1f\n(n=%d)", m, n),
-                vjust = label_vjust),
-            position = position_dodge(0.85), size = 7, fontface = "bold",
-            lineheight = 0.92) +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
-                    name = "Endorser Gender") +
-  coord_cartesian(ylim = c(common_ymin, common_ymax)) +
-  labs(
-    title    = "Strong endorsers: even bigger gender × outcome gap",
-    subtitle = subtitle2s,
-    x        = "Outcome of the endorsement",
-    y        = "Trust change  (post-outcome − pre-outcome)",
-    caption  = sprintf("N = %d  ·  error bars = 95%% CI  ·  controls: Q2 variance + participant gender", reg2s$n)
-  ) +
-  talk_theme
-
-ggsave(file.path(out_dir, "rq2_strong_only.png"),
-       plot = p2s, width = 14, height = 8, dpi = 220, bg = "white")
-cat("  ->", file.path(out_dir, "rq2_strong_only.png"), "\n")
-
-# ---- RQ2 WEAK-only single panel (same y-axis as strong for animation) ----
-pd2w <- pd2 |> filter(strength_f == "weak")
-
-p_str2w <- fmt_p(reg2w$p)
-
-subtitle2w <- bquote(
-  "Weak endorsers (n=" * .(reg2w$n) * "):  " ~
-  Delta[Male] == .(sprintf("%+.1f", eff2w$delta_male)) ~ "  •  " ~
-  Delta[Female] == .(sprintf("%+.1f", eff2w$delta_female)) ~ "  •  " ~
-  italic(b) == .(sprintf("%+.2f", reg2w$b)) ~ "," ~ italic(.(p_str2w))
+build_outcome_figure(
+  pd2 |> filter(strength_f == "weak"),
+  "rq2_weak_only.png",   common_ymin, common_ymax
 )
-
-p2w <- ggplot(pd2w, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
-  bar_geom() +
-  geom_text(aes(y = label_y,
-                label = sprintf("%.1f\n(n=%d)", m, n),
-                vjust = label_vjust),
-            position = position_dodge(0.85), size = 7, fontface = "bold",
-            lineheight = 0.92) +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
-                    name = "Endorser Gender") +
-  coord_cartesian(ylim = c(common_ymin, common_ymax)) +
-  labs(
-    title    = "Weak endorsers: same pattern, smaller magnitudes",
-    subtitle = subtitle2w,
-    x        = "Outcome of the endorsement",
-    y        = "Trust change  (post-outcome − pre-outcome)",
-    caption  = sprintf("N = %d  ·  error bars = 95%% CI  ·  controls: Q2 variance + participant gender", reg2w$n)
-  ) +
-  talk_theme
-
-ggsave(file.path(out_dir, "rq2_weak_only.png"),
-       plot = p2w, width = 14, height = 8, dpi = 220, bg = "white")
-cat("  ->", file.path(out_dir, "rq2_weak_only.png"), "\n")
-
-# ---- RQ2 facet (kept for legacy / synthesis use) ----
-ymax2 <- max(pd2$ci_hi) + 8
-ymin2 <- min(pd2$ci_lo) - 6
-
-p2 <- ggplot(pd2, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
-  bar_geom() +
-  geom_text(aes(y = label_y,
-                label = sprintf("%.1f\n(n=%d)", m, n),
-                vjust = label_vjust),
-            position = position_dodge(0.85), size = 5.8, fontface = "bold",
-            lineheight = 0.92) +
-  facet_wrap(~ strength_f, nrow = 1,
-             labeller = labeller(strength_f = c("weak"   = "Weak Endorser",
-                                                "strong" = "Strong Endorser"))) +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
-                    name = "Endorser Gender") +
-  coord_cartesian(ylim = c(ymin2, ymax2)) +
-  labs(
-    title    = "RQ2: Strength moderates the pattern",
-    subtitle = "Trust change (D2 − D1) by endorser gender, outcome, and strength",
-    x        = "Outcome",
-    y        = "Trust change  (post-outcome − pre-outcome)",
-    caption  = sprintf("N = %d  ·  error bars = 95%% CI  ·  controls: Q2 variance + participant gender", N)
-  ) +
-  talk_theme
-
-ggsave(file.path(out_dir, "rq2_strength_facet.png"),
-       plot = p2, width = 16, height = 8, dpi = 220, bg = "white")
-cat("  ->", file.path(out_dir, "rq2_strength_facet.png"), "\n")
 
 # ============================================================
-# RQ3: Initial Trust by Gender x Strength
+# RQ3: Initial trust by gender x strength (not gender x outcome)
 # ============================================================
 
 cat("\n[RQ3] Building initial-trust figure...\n")
@@ -334,40 +233,30 @@ m5 <- lm(trust_d1 ~ endorser_gender_f * strength_f, data = d)
 sm5 <- summary(m5)
 gender_p <- coef(sm5)["endorser_gender_fFemale", "Pr(>|t|)"]
 gender_b <- coef(sm5)["endorser_gender_fFemale", "Estimate"]
-cat(sprintf("  Female main effect: b=%.2f, p=%.3f\n", gender_b, gender_p))
+cat(sprintf("  Female main effect: b=%+.2f, p=%.3f\n", gender_b, gender_p))
 
-p_str3 <- if (gender_p < .001) { "p < .001" } else { sprintf("p = %.2f", gender_p) }
-
-subtitle3 <- bquote(
-  "Pre-outcome trust does not differ by gender:  " ~
-  italic(b)["gender"] == .(sprintf("%+.2f", gender_b)) ~ "," ~ italic(.(p_str3))
-)
-
+# Strong on the LEFT, Weak on the RIGHT (mirrors how we tee up "strong" first
+# in the talk narrative)
 p3 <- ggplot(pd3, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
-  bar_geom() +
-  geom_text(aes(y = ci_hi + 1.8,
-                label = sprintf("%.1f\n(n=%d)", m, n)),
-            position = position_dodge(0.85), vjust = 0,
-            size = 7, fontface = "bold", lineheight = 0.92) +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
-                    name = "Endorser Gender") +
-  scale_x_discrete(labels = c("weak" = "Weak Endorser", "strong" = "Strong Endorser")) +
+  bar_geom_v2() +
+  geom_text(aes(y = ci_hi + 2.0,
+                label = sprintf("%.0f", m)),
+            position = position_dodge(0.92), vjust = 0,
+            size = 13, fontface = "bold") +
+  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
+  scale_x_discrete(limits = c("strong", "weak"),
+                   labels = c("strong" = "Strong endorsers",
+                              "weak"   = "Weak endorsers")) +
   coord_cartesian(ylim = c(0, max(pd3$ci_hi) + 14)) +
-  labs(
-    title    = "Before the outcome, gender does not matter",
-    subtitle = subtitle3,
-    x        = "Endorsement strength",
-    y        = "Initial wager (D1, 0–100 scale)",
-    caption  = sprintf("N = %d  ·  error bars = 95%% CI  ·  outcome not yet revealed (no controls needed)", N)
-  ) +
-  talk_theme
+  labs(x = NULL, y = "Initial wager") +
+  talk_theme_v2
 
 ggsave(file.path(out_dir, "rq3_initial_trust.png"),
-       plot = p3, width = 14, height = 8, dpi = 220, bg = "white")
+       plot = p3, width = 16, height = 7.5, dpi = 220, bg = "white")
 cat("  ->", file.path(out_dir, "rq3_initial_trust.png"), "\n")
 
 # ============================================================
-# Synthesis "two bars" mini chart
+# Synthesis "two bars" mini chart (slide 17 — small inset)
 # ============================================================
 
 cat("\n[Synthesis] Mini chart...\n")
@@ -382,15 +271,15 @@ p_synth <- ggplot(synth, aes(x = Gender, y = delta, fill = Gender)) +
             vjust = -0.4, size = 11, fontface = "bold") +
   scale_fill_manual(values = c("Male" = NAVY, "Female" = RED), guide = "none") +
   scale_y_continuous(limits = c(0, max(synth$delta) + 5)) +
-  labs(
-    title    = "Outcome sensitivity",
-    subtitle = "Δ Success − Failure",
-    x        = NULL,
-    y        = "Trust change Δ"
-  ) +
-  talk_theme +
-  theme(plot.title    = element_text(size = 26),
-        plot.subtitle = element_text(size = 18))
+  labs(title = "Outcome sensitivity", subtitle = "Δ Success − Failure",
+       x = NULL, y = "Trust change Δ") +
+  theme_bw(base_size = 22) +
+  theme(plot.title    = element_text(face = "bold", size = 26),
+        plot.subtitle = element_text(size = 18, color = "gray30"),
+        axis.title    = element_text(face = "bold", size = 20),
+        axis.text     = element_text(size = 18),
+        panel.grid.minor   = element_blank(),
+        panel.grid.major.x = element_blank())
 
 ggsave(file.path(out_dir, "synthesis_outcome_sensitivity.png"),
        plot = p_synth, width = 8, height = 8, dpi = 220, bg = "white")

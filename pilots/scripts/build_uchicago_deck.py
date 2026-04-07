@@ -1116,22 +1116,143 @@ def slide_12_walk_d3(prs, summary, slide_num):
 # SLIDES 13-16: RESULTS — full-bleed figures
 # ===========================================================================
 
-def slide_results_fullbleed(prs, png_path, title, slide_num, subtitle=None):
-    """Results slide: small title, near-full-bleed figure underneath."""
+def add_stats_corner(slide, lines, x=None, y=None, w=Inches(3.50), h=Inches(1.45)):
+    """Compact stats annotation in the top-right corner of a results slide.
+
+    `lines` = list of dicts: {label, value, color, big}
+    A 'big' line gets the larger numeral treatment used for the headline
+    statistic; non-'big' lines render as label/value pairs in smaller text.
+    """
+    if x is None:
+        x = SLIDE_W - w - Inches(0.45)
+    if y is None:
+        y = Inches(0.30)
+
+    box = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, x, y, w, h
+    )
+    box.fill.solid()
+    box.fill.fore_color.rgb = RGBColor(0xFA, 0xFB, 0xFC)
+    box.line.color.rgb = RGBColor(0xCB, 0xD5, 0xE1)
+    box.line.width = Pt(0.75)
+    box.adjustments[0] = 0.18
+    tf = box.text_frame
+    tf.margin_left = Inches(0.20); tf.margin_right = Inches(0.20)
+    tf.margin_top  = Inches(0.10); tf.margin_bottom = Inches(0.10)
+    tf.word_wrap = True
+
+    for i, line in enumerate(lines):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = PP_ALIGN.LEFT
+        p.space_after = Pt(2)
+
+        run_label = p.add_run()
+        run_label.text = line["label"] + "  "
+        run_label.font.name = "Arial"
+        run_label.font.size = Pt(15 if line.get("big") else 13)
+        run_label.font.bold = line.get("big", False)
+        run_label.font.color.rgb = line.get("color", DARK)
+
+        run_value = p.add_run()
+        run_value.text = line["value"]
+        run_value.font.name = "Arial"
+        run_value.font.size = Pt(17 if line.get("big") else 14)
+        run_value.font.bold = True
+        run_value.font.color.rgb = line.get("color", DARK)
+
+    return box
+
+def add_strength_badge(slide, label_top, label_bot, fill_pct,
+                       x=Inches(7.90), y=Inches(0.30),
+                       w=Inches(2.40), h=Inches(1.45)):
+    """Small 'endorser confidence' indicator badge for RQ2 slides.
+
+    Mirrors the Stage 3 stimuli widget so the audience subliminally
+    recognizes that this slide is about strong vs weak endorsers without
+    needing to read a subtitle.
+    """
+    bg = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, x, y, w, h
+    )
+    bg.fill.solid()
+    bg.fill.fore_color.rgb = RGBColor(0xFA, 0xFB, 0xFC)
+    bg.line.color.rgb = RGBColor(0xCB, 0xD5, 0xE1)
+    bg.line.width = Pt(0.75)
+    bg.adjustments[0] = 0.18
+    bg.text_frame.text = ""
+
+    add_textbox(
+        slide, x + Inches(0.18), y + Inches(0.10),
+        w - Inches(0.36), Inches(0.30),
+        "ENDORSER CONFIDENCE",
+        size=10, bold=True, color=GRAY, font="Arial"
+    )
+
+    bar_track_y = y + Inches(0.55)
+    bar_h = Inches(0.20)
+    bar_track = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        x + Inches(0.18), bar_track_y,
+        w - Inches(0.36), bar_h
+    )
+    bar_track.fill.solid()
+    bar_track.fill.fore_color.rgb = RGBColor(0xE5, 0xE7, 0xEB)
+    bar_track.line.fill.background()
+    bar_track.adjustments[0] = 0.5
+
+    fill_w = (w - Inches(0.36)) * (fill_pct / 100.0)
+    bar_fill = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        x + Inches(0.18), bar_track_y,
+        fill_w, bar_h
+    )
+    bar_fill.fill.solid()
+    bar_fill.fill.fore_color.rgb = RGBColor(0x25, 0x63, 0xEB)
+    bar_fill.line.fill.background()
+    bar_fill.adjustments[0] = 0.5
+
+    add_textbox(
+        slide, x + Inches(0.18), y + Inches(0.86),
+        w - Inches(0.36), Inches(0.36),
+        label_bot,
+        size=18, bold=True, color=NAVY, font="Arial"
+    )
+    add_textbox(
+        slide, x + Inches(0.18), y + Inches(1.18),
+        w - Inches(0.36), Inches(0.25),
+        label_top,
+        size=11, italic=True, color=GRAY
+    )
+    return bg
+
+def slide_results_fullbleed(prs, png_path, title, slide_num,
+                            stats_lines=None, strength_badge=None):
+    """Results slide: small title strip, near-full-bleed figure underneath,
+    optional top-right stats annotation, optional middle strength badge."""
     slide = add_blank_slide(prs)
-    add_title_bar(slide, title, size=26, top=0.30)
-    if subtitle:
-        add_textbox(
-            slide, Inches(0.55), Inches(0.92), Inches(12.3), Inches(0.42),
-            subtitle, size=14, italic=True, color=GRAY
+
+    # Title positioned top-left so it doesn't fight with the corner annotations
+    add_textbox(
+        slide, Inches(0.55), Inches(0.40),
+        Inches(7.2), Inches(0.7),
+        title, size=26, bold=True, color=NAVY, font="Arial"
+    )
+
+    if strength_badge is not None:
+        add_strength_badge(
+            slide,
+            label_top=strength_badge["caption"],
+            label_bot=strength_badge["label"],
+            fill_pct=strength_badge["pct"],
         )
-        top = Inches(1.45)
-    else:
-        top = Inches(1.20)
+
+    if stats_lines is not None:
+        add_stats_corner(slide, stats_lines)
+
     if png_path.exists():
         add_picture_centered(
-            slide, png_path, top=top,
-            max_width=Inches(12.7), max_height=Inches(5.85)
+            slide, png_path, top=Inches(1.80),
+            max_width=Inches(13.20), max_height=Inches(5.25)
         )
     else:
         add_textbox(slide, Inches(3), Inches(3.5), Inches(7), Inches(1),
@@ -1140,35 +1261,73 @@ def slide_results_fullbleed(prs, png_path, title, slide_num, subtitle=None):
     add_slide_number(slide, slide_num)
     return slide
 
+def _format_p(p):
+    if p < 0.001: return "< .001"
+    return f"{p:.3f}".lstrip("0")
+
 def slide_13_rq1(prs, summary, slide_num):
+    rq1 = summary["rq1"]
     return slide_results_fullbleed(
         prs, RQ1_PNG,
-        "RQ1:  Gender × Outcome on trust update",
-        slide_num
+        "RQ1 — Gender × outcome on trust update",
+        slide_num,
+        stats_lines=[
+            {"label": "Δ Male",   "value": f"{rq1['delta_male']:+.1f}",   "color": NAVY,  "big": True},
+            {"label": "Δ Female", "value": f"{rq1['delta_female']:+.1f}", "color": RED,   "big": True},
+            {"label": "b",        "value": f"{rq1['b_interaction']:+.2f}", "color": DARK},
+            {"label": "p",        "value": f"= {_format_p(rq1['p_interaction'])}", "color": DARK},
+        ],
     )
 
 def slide_14_rq2_strong(prs, summary, slide_num):
+    rq2 = summary["rq2_strong"]
     return slide_results_fullbleed(
         prs, RQ2_STRONG_PNG,
-        "RQ2:  Strong endorsers",
+        "RQ2 — Strong endorsers",
         slide_num,
-        subtitle="When sponsors are very confident, the gender × outcome gap is biggest."
+        stats_lines=[
+            {"label": "Δ Male",   "value": f"{rq2['delta_male']:+.1f}",   "color": NAVY,  "big": True},
+            {"label": "Δ Female", "value": f"{rq2['delta_female']:+.1f}", "color": RED,   "big": True},
+            {"label": "b",        "value": f"{rq2['b_interaction']:+.2f}", "color": DARK},
+            {"label": "p",        "value": f"= {_format_p(rq2['p_interaction'])}", "color": DARK},
+        ],
+        strength_badge={
+            "caption": "very confident",
+            "label":   "Strong",
+            "pct":     85,
+        },
     )
 
 def slide_15_rq2_weak(prs, summary, slide_num):
+    rq2 = summary["rq2_weak"]
     return slide_results_fullbleed(
         prs, RQ2_WEAK_PNG,
-        "RQ2:  Weak endorsers",
+        "RQ2 — Weak endorsers",
         slide_num,
-        subtitle="When sponsors hedge, the same pattern persists at smaller magnitudes."
+        stats_lines=[
+            {"label": "Δ Male",   "value": f"{rq2['delta_male']:+.1f}",   "color": NAVY,  "big": True},
+            {"label": "Δ Female", "value": f"{rq2['delta_female']:+.1f}", "color": RED,   "big": True},
+            {"label": "b",        "value": f"{rq2['b_interaction']:+.2f}", "color": DARK},
+            {"label": "p",        "value": f"= {_format_p(rq2['p_interaction'])}", "color": DARK},
+        ],
+        strength_badge={
+            "caption": "hedged / unsure",
+            "label":   "Weak",
+            "pct":     22,
+        },
     )
 
 def slide_16_rq3(prs, summary, slide_num):
+    rq3 = summary["rq3"]
     return slide_results_fullbleed(
         prs, RQ3_PNG,
-        "RQ3:  Does the bias exist before any outcome?",
+        "RQ3 — Pre-outcome trust by gender",
         slide_num,
-        subtitle="Before the outcome arrives, audiences trust male and female sponsors equally."
+        stats_lines=[
+            {"label": "b gender", "value": f"{rq3['gender_main_b']:+.2f}",            "color": NAVY, "big": True},
+            {"label": "p",        "value": f"= {_format_p(rq3['gender_main_p'])}",   "color": DARK, "big": True},
+            {"label": " ",        "value": "no gender effect",                        "color": GRAY},
+        ],
     )
 
 # ===========================================================================
