@@ -100,25 +100,26 @@ fit_interaction <- function(df) {
        n = nrow(df))
 }
 
-# ---- Slide-fill talk theme ----
-talk_theme_v2 <- theme_bw(base_size = 24) +
+# ---- Slide-fill talk theme (panel-dominant: smaller text, larger plot area) ----
+talk_theme_v2 <- theme_bw(base_size = 18) +
   theme(
     plot.title          = element_blank(),
     plot.subtitle       = element_blank(),
     plot.caption        = element_blank(),
-    plot.margin         = margin(28, 36, 18, 26),
+    plot.margin         = margin(8, 18, 8, 12),
     axis.title.x        = element_blank(),
-    axis.title.y        = element_text(face = "bold", size = 28, margin = margin(r = 16)),
-    axis.text.x         = element_text(size = 36, color = "gray10", face = "bold",
-                                       margin = margin(t = 8)),
-    axis.text.y         = element_text(size = 24, color = "gray20"),
+    axis.title.y        = element_text(face = "bold", size = 19, margin = margin(r = 10)),
+    axis.text.x         = element_text(size = 24, color = "gray10", face = "bold",
+                                       margin = margin(t = 6)),
+    axis.text.y         = element_text(size = 17, color = "gray20"),
     legend.position     = "top",
     legend.justification = "center",
     legend.title        = element_blank(),
-    legend.text         = element_text(face = "bold", size = 28),
-    legend.key.size     = unit(1.8, "lines"),
-    legend.margin       = margin(0, 0, 12, 0),
+    legend.text         = element_text(face = "bold", size = 19),
+    legend.key.size     = unit(1.3, "lines"),
+    legend.margin       = margin(0, 0, 4, 0),
     legend.box.margin   = margin(0, 0, 0, 0),
+    legend.box.spacing  = unit(0.2, "lines"),
     panel.grid.minor    = element_blank(),
     panel.grid.major.x  = element_blank()
   )
@@ -128,8 +129,8 @@ bar_geom_v2 <- function() {
   list(
     geom_bar(stat = "identity", position = position_dodge(0.92), width = 0.85),
     geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
-                  position = position_dodge(0.92), width = 0.18, linewidth = 1.4),
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", linewidth = 0.8)
+                  position = position_dodge(0.92), width = 0.18, linewidth = 1.2),
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray50", linewidth = 0.7)
   )
 }
 
@@ -147,7 +148,7 @@ build_outcome_figure <- function(pd, fname, ymin, ymax) {
     geom_text(aes(y = label_y,
                   label = sprintf("%+.1f", m),
                   vjust = label_vjust),
-              position = position_dodge(0.92), size = 13, fontface = "bold") +
+              position = position_dodge(0.92), size = 9, fontface = "bold") +
     scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
     # SUCCESS LEFT, FAILURE RIGHT (overrides factor order, regression unchanged)
     scale_x_discrete(limits = c("Success", "Failure")) +
@@ -242,7 +243,7 @@ p3 <- ggplot(pd3, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
   geom_text(aes(y = ci_hi + 2.0,
                 label = sprintf("%.0f", m)),
             position = position_dodge(0.92), vjust = 0,
-            size = 13, fontface = "bold") +
+            size = 9, fontface = "bold") +
   scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
   scale_x_discrete(limits = c("strong", "weak"),
                    labels = c("strong" = "Strong endorsers",
@@ -252,7 +253,7 @@ p3 <- ggplot(pd3, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
   talk_theme_v2
 
 ggsave(file.path(out_dir, "rq3_initial_trust.png"),
-       plot = p3, width = 16, height = 7.5, dpi = 220, bg = "white")
+       plot = p3, width = 15, height = 6, dpi = 240, bg = "white")
 cat("  ->", file.path(out_dir, "rq3_initial_trust.png"), "\n")
 
 # ============================================================
@@ -282,7 +283,7 @@ p_synth <- ggplot(synth, aes(x = Gender, y = delta, fill = Gender)) +
         panel.grid.major.x = element_blank())
 
 ggsave(file.path(out_dir, "synthesis_outcome_sensitivity.png"),
-       plot = p_synth, width = 8, height = 8, dpi = 220, bg = "white")
+       plot = p_synth, width = 9, height = 6.5, dpi = 240, bg = "white")
 cat("  ->", file.path(out_dir, "synthesis_outcome_sensitivity.png"), "\n")
 
 # ============================================================
