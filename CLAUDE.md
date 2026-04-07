@@ -77,27 +77,39 @@ Updates QuestionText (HTML) and QuestionJS for QID3, QID4, QID5 via Qualtrics AP
 
 ## Talk Deck Pipeline (UChicago — April 10, 2026)
 
-**Deliverable:** `docs/UChicago-0410.pptx` (21 slides). First draft built 2026-04-06; needs further edits.
+**Deliverable:** `docs/UChicago-0410.pptx` (20 slides). **In maintenance state** — Jose has been editing the .pptx directly in PowerPoint. **Every manual edit must be preserved.**
 
-**Build pipeline (4 scripts, run in order):**
+**THE GOLDEN RULE:** Use `patch_deck.py` for any deck change. **Never** run `build_uchicago_deck.py` without explicit permission and a backup — it rebuilds from scratch and will obliterate all of Jose's manual edits.
+
+**Active pipeline scripts:**
+| Script | Status | Purpose |
+|---|---|---|
+| `pilots/scripts/patch_deck.py` | **PRIMARY** | Surgical in-place edits to the live deck |
+| `pilots/scripts/inspect_deck.py` | **PRIMARY** | Read-only walker; run first to see what's actually in the deck |
+| `pilots/scripts/make_talk_figures.R` | active | RQ1/2/3/synthesis figures + JSON summary |
+| `pilots/scripts/render_stage3_screens.py` | active | Stage 3 walkthrough screens (Playwright Firefox) |
+| `pilots/scripts/build_uchicago_deck.py` | **archived** | Original from-scratch builder; do not run without explicit permission |
+| `pilots/scripts/render_hook_card.py` | **deprecated** | Hook is now native python-pptx shapes |
+
+**Re-render figures only (does NOT touch the deck):**
 ```bash
-PYTHONIOENCODING=utf-8 python pilots/scripts/render_stage3_screens.py --mode both
-PYTHONIOENCODING=utf-8 python pilots/scripts/render_hook_card.py
 "/c/Program Files/R/R-4.5.2/bin/Rscript.exe" pilots/scripts/make_talk_figures.R
-PYTHONIOENCODING=utf-8 python pilots/scripts/build_uchicago_deck.py
+PYTHONIOENCODING=utf-8 python pilots/scripts/render_stage3_screens.py --mode walkthrough
+PYTHONIOENCODING=utf-8 python pilots/scripts/patch_deck.py
 ```
 
-**Visual verification (LibreOffice → PDF → per-slide PNG previews):**
+**Visual verification (LibreOffice → PDF → per-slide PNG previews; gitignored):**
 ```bash
 "/c/Program Files/LibreOffice/program/soffice.exe" --headless --convert-to pdf \
   --outdir pilots/output/deck_preview docs/UChicago-0410.pptx
 ```
-Then re-render `pilots/output/deck_preview/pages/slide{01..21}.png` via `pypdfium2`.
+Then re-render `pilots/output/deck_preview/pages/slide{01..20}.png` via `pypdfium2`.
 
 **Hard rules for any future edit:**
+- **Use `patch_deck.py`, never `build_uchicago_deck.py`** without explicit permission. Back up the deck before any patch run.
+- **Slide numbers** use the template-native `<a:fld type="slidenum">` placeholder cloned from the user-inserted slide 10. They auto-update with position. Don't add custom `"X / 20"` textboxes.
 - The Stage 3 screen renderer **always refetches the live Qualtrics survey via API** by default. The on-disk `survey_*_definition.json` is a stale cache; trust live, not local.
 - **No Chrome/Chromium for HTML→image rendering.** Use Playwright Firefox (already installed). The legacy `pilots/scripts/generate_condition_stimuli.py` uses Chromium and is a hand-rolled HTML mock-up — it is **deprecated**, do not call it from the talk pipeline.
-- All slide content lives in `pilots/scripts/build_uchicago_deck.py` as per-slide functions (`slide_01_hook`, `slide_02_what_is_sponsorship`, …, `slide_21_thanks`). Edit those, then re-run the build. Do not hand-edit the .pptx in PowerPoint and expect to re-run the script — the script is the source of truth.
-- The synthesis slide (slide 18) explicitly says the new pilot does NOT replicate the old "women punished more harshly" pattern; instead it shows men's endorsements get updated against more in BOTH directions. This honest framing flip is intentional — don't undo it without explicit go-ahead.
+- The synthesis slide (now titled **"Summary"**) reframes the result as bidirectional muted updating of women's endorsements, NOT asymmetric punishment. Don't undo this framing flip.
 
-Full handoff context (slide map, knobs, locked decisions, pilot numbers) is in the auto-memory file `project_uchicago_talk.md`.
+Full handoff context — current 20-slide map, every manual edit Jose has made, the patch workflow, pilot numbers, and the future-LLM checklist — is in the auto-memory file `project_uchicago_talk.md`. **Read it first** before any deck work.
