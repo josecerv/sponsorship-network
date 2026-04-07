@@ -34,3 +34,10 @@ pilots/output/_qid*_current.json
 
 # Pilot data (contains participant responses)
 pilot/output/pilot_data.csv
+
+# Talk-pipeline regenerable artifacts (rebuild from scripts as needed)
+pilots/output/deck_preview/
+pilots/output/maurice_slide_images/
+pilots/output/pdf_extracted_figs/
+pilots/output/stage3_rendered_screens/all_conditions/
+pilots/output/temp_*.R
