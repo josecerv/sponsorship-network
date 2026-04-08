@@ -304,6 +304,218 @@ ggsave(file.path(out_dir, "rq1_overall.png"),
 cat("  ->", file.path(out_dir, "rq1_overall.png"), "\n")
 
 # ============================================================
+# RQ1 combined: 2-panel composite WITHOUT reference bands.
+# ------------------------------------------------------------
+# Jose will animate any "sponsor said" overlays himself on top of
+# this figure. The figure itself shows OVERALL (left) and BY GENDER
+# (right) initial wagers with matching confidence intervals and
+# value labels that sit cleanly above the CI bounds (no clipping).
+# ============================================================
+
+suppressPackageStartupMessages(library(patchwork))
+
+cat("\n[RQ1 combined] Building 2-panel composite (no bands)...\n")
+
+# Recompute overall_by_strength WITH confidence intervals so the
+# OVERALL panel bars can carry the same error bars as the gender panel.
+overall_by_strength_ci <- d |>
+  group_by(strength_f) |>
+  summarise(
+    m  = mean(trust_d1, na.rm = TRUE),
+    sd = sd(trust_d1,   na.rm = TRUE),
+    n  = n(),
+    se = sd / sqrt(n),
+    ci_lo = m - 1.96 * se,
+    ci_hi = m + 1.96 * se,
+    .groups = "drop"
+  ) |>
+  mutate(strength_display = factor(strength_f,
+                                   levels = c("strong", "weak"),
+                                   labels = c("Strong", "Weak")))
+
+pd3_rq1 <- pd3 |>
+  mutate(strength_display = factor(strength_f,
+                                   levels = c("strong", "weak"),
+                                   labels = c("Strong", "Weak")))
+
+# Common y-range tight around the data + CIs + value labels, no headroom
+# for reference bands (removed) — keeps the bars big and readable.
+YMIN_RQ1 <- 0
+YMAX_RQ1 <- max(
+  max(pd3_rq1$ci_hi, na.rm = TRUE),
+  max(overall_by_strength_ci$ci_hi, na.rm = TRUE)
+) + 12  # headroom for value labels
+
+# LEFT PANEL — overall (2 bars with CIs)
+p_rq1_overall <- ggplot(overall_by_strength_ci,
+                        aes(x = strength_display, y = m)) +
+  geom_bar(stat = "identity", width = 0.55, fill = NAVY,
+           color = "#000c2e", linewidth = 0.35) +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                width = 0.14, linewidth = 1.2) +
+  geom_text(aes(y = ci_hi + (YMAX_RQ1 * 0.045),
+                label = sprintf("%.0f", m)),
+            size = 10, fontface = "bold", color = "gray10") +
+  scale_x_discrete(limits = c("Strong", "Weak")) +
+  coord_cartesian(ylim = c(YMIN_RQ1, YMAX_RQ1)) +
+  labs(x = NULL, y = "Initial wager (0\u2013100)") +
+  ggtitle("OVERALL") +
+  talk_theme_v2 +
+  theme(plot.title = element_text(face = "bold", size = 15, color = "gray25",
+                                   hjust = 0.5, margin = margin(b = 4)),
+        legend.position = "none")
+
+# RIGHT PANEL — by sponsor gender (4 dodged bars with CIs)
+p_rq1_by_gender <- ggplot(pd3_rq1, aes(x = strength_display, y = m,
+                                        fill = endorser_gender_f)) +
+  geom_bar(stat = "identity", position = position_dodge(0.72), width = 0.66,
+           color = "#000c2e", linewidth = 0.35) +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi),
+                position = position_dodge(0.72), width = 0.13, linewidth = 1.2) +
+  geom_text(aes(y = ci_hi + (YMAX_RQ1 * 0.045),
+                label = sprintf("%.0f", m)),
+            position = position_dodge(0.72),
+            size = 9, fontface = "bold") +
+  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
+                    breaks = c("Male", "Female")) +
+  scale_x_discrete(limits = c("Strong", "Weak")) +
+  coord_cartesian(ylim = c(YMIN_RQ1, YMAX_RQ1)) +
+  labs(x = NULL, y = NULL) +
+  ggtitle("BY SPONSOR GENDER") +
+  talk_theme_v2 +
+  theme(plot.title = element_text(face = "bold", size = 15, color = "gray25",
+                                   hjust = 0.5, margin = margin(b = 4)),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+combined_rq1 <- p_rq1_overall + p_rq1_by_gender +
+  plot_layout(widths = c(1, 1.65))
+
+# 15x6 matches the RQ2/RQ3 slide figure aspect ratio exactly so slide 22
+# lines up visually with slides 24/25.
+ggsave(file.path(out_dir, "rq1_combined.png"),
+       plot = combined_rq1, width = 15, height = 6, dpi = 260, bg = "white")
+cat("  ->", file.path(out_dir, "rq1_combined.png"), "\n")
+
+# ============================================================
+# Prior-distribution theory figure for slide 27 "Running story"
+# ------------------------------------------------------------
+# Two hypothetical density curves visualizing Jose's theory that
+# evaluators hold DIFFERENT priors about what men vs women
+# sponsors will endorse: women assumed forgiving + narrow
+# (hard to read signal from), men assumed critical + wide
+# (endorsement carries more information).
+# ============================================================
+
+cat("\n[Priors] Building theory-distribution figure...\n")
+
+prior_x <- seq(0, 100, length.out = 500)
+prior_men   <- dnorm(prior_x, mean = 52, sd = 22)
+prior_women <- dnorm(prior_x, mean = 72, sd = 10)
+
+prior_df <- tibble(
+  x       = rep(prior_x, 2),
+  density = c(prior_men, prior_women),
+  sponsor = factor(rep(c("Men", "Women"), each = length(prior_x)),
+                   levels = c("Men", "Women"))
+)
+
+p_prior <- ggplot(prior_df, aes(x = x, y = density,
+                                 fill = sponsor, color = sponsor)) +
+  geom_area(alpha = 0.55, position = "identity") +
+  geom_line(linewidth = 1.6) +
+  scale_fill_manual(values = c("Men" = NAVY, "Women" = RED)) +
+  scale_color_manual(values = c("Men" = "#000c2e", "Women" = "#4d0000"),
+                     guide = "none") +
+  scale_x_continuous(
+    breaks = c(0, 25, 50, 75, 100),
+    labels = c("0\n(harsh)", "25", "50", "75", "100\n(generous)"),
+    limits = c(-5, 105),
+    expand = expansion(0)
+  ) +
+  labs(x = "Assumed endorsement on a random candidate",
+       y = NULL) +
+  theme_minimal(base_size = 18) +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(face = "bold", size = 22),
+    legend.margin = margin(0, 0, 4, 0),
+    axis.title.x = element_text(face = "bold", size = 16,
+                                 color = "gray25",
+                                 margin = margin(t = 8)),
+    axis.text.x  = element_text(size = 15, color = "gray20", lineheight = 0.9),
+    axis.text.y  = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.major.x = element_line(color = "gray90"),
+    plot.margin = margin(8, 22, 6, 12)
+  )
+
+ggsave(file.path(out_dir, "prior_distributions.png"),
+       plot = p_prior, width = 7.8, height = 4.8, dpi = 260, bg = "white")
+cat("  ->", file.path(out_dir, "prior_distributions.png"), "\n")
+
+# ============================================================
+# Attribution-theory figure for slide 27 "Running story" (v8).
+# ------------------------------------------------------------
+# Replaces the prior-distribution figure with an attribution-
+# weight visualization. The reframed running story says people
+# take men's and women's endorsements at face value up front
+# (explains RQ1 null) but attribute outcomes differently: a
+# man's outcome is read as evidence about HIS JUDGMENT, while
+# a woman's outcome is read as luck or situation. The figure
+# shows the hypothesized share of an outcome that gets
+# attributed to the sponsor's own judgment. Numbers are
+# illustrative, not measured — the 3:1 ratio echoes the
+# empirical RQ2 ratio Delta_Male +15 / Delta_Female +4.3.
+# ============================================================
+
+cat("\n[Attribution theory] Building figure...\n")
+
+attr_df <- tibble(
+  gender = factor(c("Men", "Women"), levels = c("Men", "Women")),
+  pct    = c(75, 25),
+  lbl    = c("~75%", "~25%")
+)
+
+p_attr <- ggplot(attr_df, aes(x = gender, y = pct, fill = gender)) +
+  geom_bar(stat = "identity", width = 0.58,
+           color = "#0a0a0a", linewidth = 0.45) +
+  geom_text(aes(label = lbl),
+            vjust = -0.4, size = 11, fontface = "bold", color = "gray10") +
+  scale_fill_manual(values = c("Men" = NAVY, "Women" = RED), guide = "none") +
+  scale_y_continuous(
+    limits = c(0, 100),
+    breaks = c(0, 25, 50, 75, 100),
+    labels = c("0%", "25%", "50%", "75%", "100%"),
+    expand = c(0, 0)
+  ) +
+  labs(
+    x = NULL,
+    y = "Outcome attributed to sponsor's judgment"
+  ) +
+  theme_minimal(base_size = 18) +
+  theme(
+    axis.title.y = element_text(face = "bold", size = 14, color = "gray30",
+                                 margin = margin(r = 8)),
+    axis.text.x = element_text(face = "bold", size = 24, color = "gray10"),
+    axis.text.y = element_text(size = 14, color = "gray30"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(color = "gray88"),
+    panel.border = element_blank(),
+    axis.line.x = element_line(color = "gray60", linewidth = 0.5),
+    plot.margin = margin(14, 18, 6, 10),
+    legend.position = "none"
+  )
+
+ggsave(file.path(out_dir, "attribution_theory.png"),
+       plot = p_attr, width = 7.8, height = 4.8, dpi = 260, bg = "white")
+cat("  ->", file.path(out_dir, "attribution_theory.png"), "\n")
+
+# ============================================================
 # Synthesis "two bars" mini chart (Summary slide — right-side inset)
 # ------------------------------------------------------------
 # Uses talk_theme_v2 so the Male/Female x-axis labels match the
