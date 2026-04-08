@@ -283,6 +283,26 @@ ggsave(file.path(out_dir, "rq3_initial_trust.png"),
        plot = p3, width = 15, height = 6, dpi = 240, bg = "white")
 cat("  ->", file.path(out_dir, "rq3_initial_trust.png"), "\n")
 
+# ---- RQ1 alternative: overall-only (just 2 bars by strength) ----
+# For the "first show the overall, then split by gender" narrative:
+# this is the "first" chart. Paired with rq3_initial_trust.png (the
+# "then split" chart), both sit on slide 21 as a 2-panel composite.
+cat("\n[RQ1 alt] Building overall-by-strength figure...\n")
+p3_overall <- ggplot(overall_by_strength,
+                     aes(x = strength_display, y = m_overall)) +
+  geom_bar(stat = "identity", width = 0.60, fill = NAVY) +
+  geom_text(aes(label = sprintf("%.0f", m_overall)),
+            vjust = -0.4, size = 11, fontface = "bold", color = "gray10") +
+  scale_x_discrete(limits = c("Strong", "Weak")) +
+  coord_cartesian(ylim = c(0, max(pd3$ci_hi) + 16)) +
+  labs(x = NULL, y = "Initial wager") +
+  talk_theme_v2 +
+  theme(legend.position = "none")
+
+ggsave(file.path(out_dir, "rq1_overall.png"),
+       plot = p3_overall, width = 6.5, height = 6, dpi = 240, bg = "white")
+cat("  ->", file.path(out_dir, "rq1_overall.png"), "\n")
+
 # ============================================================
 # Synthesis "two bars" mini chart (Summary slide — right-side inset)
 # ------------------------------------------------------------
