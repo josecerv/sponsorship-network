@@ -134,7 +134,9 @@ bar_geom_v2 <- function() {
   )
 }
 
-# Build a generic outcome-axis figure (RQ1, RQ2 strong, RQ2 weak)
+# Build a generic gender-axis figure (RQ1, RQ2 strong, RQ2 weak)
+# TRANSPOSED 2026-04-07: gender now on the x-axis, outcome is the legend.
+# This makes the story "trust updates differently by gender" read left-to-right.
 build_outcome_figure <- function(pd, fname, ymin, ymax) {
   pd <- pd |>
     mutate(
@@ -143,15 +145,15 @@ build_outcome_figure <- function(pd, fname, ymin, ymax) {
       label_vjust = ifelse(m >= 0, 0, 1)
     )
 
-  p <- ggplot(pd, aes(x = outcome_f, y = m, fill = endorser_gender_f)) +
+  p <- ggplot(pd, aes(x = endorser_gender_f, y = m, fill = outcome_f)) +
     bar_geom_v2() +
     geom_text(aes(y = label_y,
                   label = sprintf("%+.1f", m),
                   vjust = label_vjust),
               position = position_dodge(0.92), size = 9, fontface = "bold") +
-    scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
-    # SUCCESS LEFT, FAILURE RIGHT (overrides factor order, regression unchanged)
-    scale_x_discrete(limits = c("Success", "Failure")) +
+    scale_fill_manual(values = c("Success" = NAVY, "Failure" = RED)) +
+    # MALE LEFT, FEMALE RIGHT (regression unchanged — display order only)
+    scale_x_discrete(limits = c("Male", "Female")) +
     coord_cartesian(ylim = c(ymin, ymax)) +
     labs(x = NULL, y = "Trust update") +
     talk_theme_v2
@@ -236,18 +238,24 @@ gender_p <- coef(sm5)["endorser_gender_fFemale", "Pr(>|t|)"]
 gender_b <- coef(sm5)["endorser_gender_fFemale", "Estimate"]
 cat(sprintf("  Female main effect: b=%+.2f, p=%.3f\n", gender_b, gender_p))
 
-# Strong on the LEFT, Weak on the RIGHT (mirrors how we tee up "strong" first
-# in the talk narrative)
-p3 <- ggplot(pd3, aes(x = strength_f, y = m, fill = endorser_gender_f)) +
+# TRANSPOSED 2026-04-08: gender on the x-axis (Male left, Female right),
+# strength as the fill legend. Matches the RQ2/new-RQ3 transposition so all
+# result figures read the same left-to-right: Male then Female.
+# Display-only override: force Strong to appear left of Weak inside each
+# gender group (and in the legend) without touching the regression reference.
+pd3_disp <- pd3 |>
+  mutate(strength_display = factor(strength_f, levels = c("strong", "weak")))
+
+p3 <- ggplot(pd3_disp, aes(x = endorser_gender_f, y = m, fill = strength_display)) +
   bar_geom_v2() +
   geom_text(aes(y = ci_hi + 2.0,
                 label = sprintf("%.0f", m)),
             position = position_dodge(0.92), vjust = 0,
             size = 9, fontface = "bold") +
-  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED)) +
-  scale_x_discrete(limits = c("strong", "weak"),
-                   labels = c("strong" = "Strong endorsers",
-                              "weak"   = "Weak endorsers")) +
+  scale_fill_manual(values = c("strong" = NAVY, "weak" = RED),
+                    breaks = c("strong", "weak"),
+                    labels = c("strong" = "Strong", "weak" = "Weak")) +
+  scale_x_discrete(limits = c("Male", "Female")) +
   coord_cartesian(ylim = c(0, max(pd3$ci_hi) + 14)) +
   labs(x = NULL, y = "Initial wager") +
   talk_theme_v2
@@ -257,7 +265,12 @@ ggsave(file.path(out_dir, "rq3_initial_trust.png"),
 cat("  ->", file.path(out_dir, "rq3_initial_trust.png"), "\n")
 
 # ============================================================
-# Synthesis "two bars" mini chart (slide 17 — small inset)
+# Synthesis "two bars" mini chart (Summary slide — right-side inset)
+# ------------------------------------------------------------
+# Uses talk_theme_v2 so the Male/Female x-axis labels match the
+# size-24 bold styling on the RQ result slides. The slide title
+# carries "Outcome sensitivity" so the figure has no in-figure
+# title/subtitle.
 # ============================================================
 
 cat("\n[Synthesis] Mini chart...\n")
@@ -267,20 +280,14 @@ synth <- tibble(
 )
 
 p_synth <- ggplot(synth, aes(x = Gender, y = delta, fill = Gender)) +
-  geom_bar(stat = "identity", width = 0.6) +
+  geom_bar(stat = "identity", width = 0.65) +
   geom_text(aes(label = sprintf("%+.1f", delta)),
             vjust = -0.4, size = 11, fontface = "bold") +
   scale_fill_manual(values = c("Male" = NAVY, "Female" = RED), guide = "none") +
+  scale_x_discrete(limits = c("Male", "Female")) +
   scale_y_continuous(limits = c(0, max(synth$delta) + 5)) +
-  labs(title = "Outcome sensitivity", subtitle = "Δ Success − Failure",
-       x = NULL, y = "Trust change Δ") +
-  theme_bw(base_size = 22) +
-  theme(plot.title    = element_text(face = "bold", size = 26),
-        plot.subtitle = element_text(size = 18, color = "gray30"),
-        axis.title    = element_text(face = "bold", size = 20),
-        axis.text     = element_text(size = 18),
-        panel.grid.minor   = element_blank(),
-        panel.grid.major.x = element_blank())
+  labs(x = NULL, y = "Trust update Δ") +
+  talk_theme_v2
 
 ggsave(file.path(out_dir, "synthesis_outcome_sensitivity.png"),
        plot = p_synth, width = 9, height = 6.5, dpi = 240, bg = "white")
