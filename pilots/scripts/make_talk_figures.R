@@ -238,25 +238,44 @@ gender_p <- coef(sm5)["endorser_gender_fFemale", "Pr(>|t|)"]
 gender_b <- coef(sm5)["endorser_gender_fFemale", "Estimate"]
 cat(sprintf("  Female main effect: b=%+.2f, p=%.3f\n", gender_b, gender_p))
 
-# TRANSPOSED 2026-04-08: gender on the x-axis (Male left, Female right),
-# strength as the fill legend. Matches the RQ2/new-RQ3 transposition so all
-# result figures read the same left-to-right: Male then Female.
-# Display-only override: force Strong to appear left of Weak inside each
-# gender group (and in the legend) without touching the regression reference.
+# RE-TRANSPOSED 2026-04-08 (narrative pass): strength on the x-axis,
+# gender as the fill. The story of RQ1 is "no gender effect on the
+# initial wager" — that reads clearest when the Male and Female bars
+# sit side-by-side within each strength group (and are obviously the
+# same height). This breaks parallelism with RQ2/RQ3 on purpose.
 pd3_disp <- pd3 |>
-  mutate(strength_display = factor(strength_f, levels = c("strong", "weak")))
+  mutate(strength_display = factor(strength_f,
+                                   levels = c("strong", "weak"),
+                                   labels = c("Strong", "Weak")))
 
-p3 <- ggplot(pd3_disp, aes(x = endorser_gender_f, y = m, fill = strength_display)) +
+# Overall means by strength (ignoring gender) — plotted as horizontal
+# rules behind the grouped bars so the audience sees the aggregate
+# anchor first, then notices the gender bars sit on top of it.
+overall_by_strength <- d |>
+  group_by(strength_f) |>
+  summarise(m_overall = mean(trust_d1, na.rm = TRUE), .groups = "drop") |>
+  mutate(strength_display = factor(strength_f,
+                                   levels = c("strong", "weak"),
+                                   labels = c("Strong", "Weak")))
+
+p3 <- ggplot(pd3_disp, aes(x = strength_display, y = m, fill = endorser_gender_f)) +
   bar_geom_v2() +
   geom_text(aes(y = ci_hi + 2.0,
                 label = sprintf("%.0f", m)),
             position = position_dodge(0.92), vjust = 0,
             size = 9, fontface = "bold") +
-  scale_fill_manual(values = c("strong" = NAVY, "weak" = RED),
-                    breaks = c("strong", "weak"),
-                    labels = c("strong" = "Strong", "weak" = "Weak")) +
-  scale_x_discrete(limits = c("Male", "Female")) +
-  coord_cartesian(ylim = c(0, max(pd3$ci_hi) + 14)) +
+  # Overall-by-strength annotations above the grouped bars
+  geom_text(data = overall_by_strength,
+            aes(x = strength_display,
+                y = max(pd3$ci_hi) + 10,
+                label = sprintf("overall: %.0f", m_overall)),
+            inherit.aes = FALSE,
+            size = 8, fontface = "italic", color = "gray30") +
+  scale_fill_manual(values = c("Male" = NAVY, "Female" = RED),
+                    breaks = c("Male", "Female"),
+                    labels = c("Male" = "Male", "Female" = "Female")) +
+  scale_x_discrete(limits = c("Strong", "Weak")) +
+  coord_cartesian(ylim = c(0, max(pd3$ci_hi) + 16)) +
   labs(x = NULL, y = "Initial wager") +
   talk_theme_v2
 
