@@ -26,8 +26,14 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# Temp API responses
+# Temp API responses + session scratch (regenerable)
 pilots/output/_qid*_current.json
+pilots/output/_*
+pilots/output/gdoc_backup.json
+
+# Python cache
+__pycache__/
+*.pyc
 
 # Environment variables
 .env

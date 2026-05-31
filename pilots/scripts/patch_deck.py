@@ -42,12 +42,18 @@ RQ2_WEAK     = FIG_DIR / "rq2_weak_only.png"
 RQ3_PNG      = FIG_DIR / "rq3_initial_trust.png"
 SYNTH_PNG    = FIG_DIR / "synthesis_outcome_sensitivity.png"
 
-# Slide numbers in the CURRENT (post-edit) deck
-SLIDE_RQ1            = 14
-SLIDE_RQ2_STRONG     = 15
-SLIDE_RQ2_WEAK       = 16
-SLIDE_RQ3            = 17
-SLIDE_SYNTHESIS      = 18
+# Slide numbers in the CURRENT (post-edit) deck.
+# HISTORY: these were 14/15/16/17/18 when the deck had 20 slides. On
+# 2026-04-07 Jose inserted 2 extra incentive slides (positions 9 & 11)
+# plus an appendix slide at the end, so the result/RQ slides shifted by
+# +2. Always re-verify via inspect_deck.py before running this script;
+# Jose is actively doing manual PowerPoint edits and the deck layout
+# may drift again. See project_uchicago_talk.md for the current map.
+SLIDE_RQ1            = 16
+SLIDE_RQ2_STRONG     = 17
+SLIDE_RQ2_WEAK       = 18
+SLIDE_RQ3            = 19
+SLIDE_SYNTHESIS      = 20
 
 SLIDE_NUM_PATTERN = re.compile(r"^\s*\d+\s*/\s*\d+\s*$")
 

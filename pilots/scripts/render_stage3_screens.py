@@ -23,6 +23,7 @@ Outputs:
 """
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -44,12 +45,50 @@ ENV_PATH   = PROJECT / ".env"
 JSON_PATH  = SCRIPT_DIR.parent / "output" / f"survey_{SURVEY_ID}_definition.json"
 OUT_DIR    = SCRIPT_DIR.parent / "output" / "stage3_rendered_screens"
 
-# Inline SVG avatars (matches what is shown in Qualtrics; the live JS uses
-# Graphic.php URLs that are auth-protected, but the visible result is
-# identical to these inline data URIs).
+# Endorser avatars: the REAL Qualtrics Graphic.php images that participants
+# see in the live survey, embedded as base64 data URIs so Playwright can render
+# them without a network fetch. These are gray silhouette icons — the pink/
+# blue color that participants perceive comes from the GENDER_STYLE CSS
+# block applied to the avatar + card + badge, NOT from the image itself.
+# See port_gender_style() below — it mirrors the live JS populate() handler
+# in pilots/qualtrics_js/stage3_qid3_combined.js.
+_AVATAR_DIR = SCRIPT_DIR.parent / "output" / "talk_figures"
+
+def _load_png_as_data_uri(path):
+    data = Path(path).read_bytes()
+    b64 = base64.b64encode(data).decode("ascii")
+    return f"data:image/png;base64,{b64}"
+
 ICON = {
-    "Woman": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%23EC4899'/%3E%3Ccircle cx='60' cy='44' r='18' fill='white'/%3E%3Cpath d='M30 112 C30 86 43 74 60 74 C77 74 90 86 90 112' fill='white'/%3E%3C/svg%3E",
-    "Man":   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%233B82F6'/%3E%3Ccircle cx='60' cy='44' r='18' fill='white'/%3E%3Cpath d='M30 112 C30 86 43 74 60 74 C77 74 90 86 90 112' fill='white'/%3E%3C/svg%3E",
+    "Woman": _load_png_as_data_uri(_AVATAR_DIR / "endorser_woman_live.png"),
+    "Man":   _load_png_as_data_uri(_AVATAR_DIR / "endorser_man_live.png"),
+}
+
+# Exact port of GENDER_STYLE from the live QID3 JS. Keep in sync with
+# pilots/qualtrics_js/stage3_qid3_combined.js. The Python renderer applies
+# these styles inline via BeautifulSoup because we have no JS engine at
+# render time.
+GENDER_STYLE = {
+    "Woman": {
+        "border":      "3px solid #DB2777",
+        "bg":          "#FDF2F8",
+        "shadow":      "0 0 0 3px #FBCFE8",
+        "badge_bg":    "#FCE7F3",
+        "badge_color": "#9D174D",
+        "card_border": "4px solid #EC4899",
+        "card_bg":     "#FDF2F8",
+        "bar_color":   "#EC4899",
+    },
+    "Man": {
+        "border":      "3px solid #2563EB",
+        "bg":          "#EFF6FF",
+        "shadow":      "0 0 0 3px #BFDBFE",
+        "badge_bg":    "#DBEAFE",
+        "badge_color": "#1E40AF",
+        "card_border": "4px solid #3B82F6",
+        "card_bg":     "#EFF6FF",
+        "bar_color":   "#3B82F6",
+    },
 }
 
 COND_ORDER = [
@@ -250,12 +289,73 @@ def _add_class(soup, elem_id, cls):
     el["class"] = classes
     return True
 
+def _append_inline_style(el, extra_css):
+    """Merge extra inline CSS onto an element's existing style attribute."""
+    if el is None:
+        return
+    existing = (el.get("style") or "").rstrip("; ").strip()
+    if existing:
+        el["style"] = f"{existing}; {extra_css}"
+    else:
+        el["style"] = extra_css
+
+def apply_gender_style(soup, endorser_gender):
+    """Port the live QID3 populate() GENDER_STYLE block to static HTML.
+
+    Mirrors pilots/qualtrics_js/stage3_qid3_combined.js (lines ~255-284):
+      1. Avatar img: colored border + tinted bg + glow ring
+      2. Badge pill: "Endorser" text in a colored pill
+      3. Endorser card: colored left accent + tinted background
+    """
+    gs = GENDER_STYLE[endorser_gender]
+
+    # 1. Avatar: colored border + tinted bg + glow ring
+    end_img = soup.find(id="endorser_img")
+    if end_img is not None:
+        avatar_css = (
+            f"border:{gs['border']}; "
+            f"background-color:{gs['bg']}; "
+            f"box-shadow:{gs['shadow']}"
+        )
+        if endorser_gender == "Woman":
+            avatar_css += "; object-position:44% center"
+        _append_inline_style(end_img, avatar_css)
+
+    # 2. Badge pill inside the stage3 wrapper (scoped to avoid hitting other badges)
+    badge = soup.select_one("#stage3-eval .badge") or soup.select_one("#stage3-outcome .badge")
+    if badge is not None:
+        badge.string = "Endorser"
+        badge_css = (
+            f"background-color:{gs['badge_bg']}; "
+            f"color:{gs['badge_color']}; "
+            f"padding:3px 12px; "
+            f"border-radius:12px; "
+            f"font-weight:700"
+        )
+        _append_inline_style(badge, badge_css)
+
+    # 3. Endorser card: colored left accent + tinted bg (walk up to ancestor .card)
+    if end_img is not None:
+        card = end_img
+        while card is not None and card.name is not None:
+            classes = card.get("class") or []
+            if "card" in classes:
+                break
+            card = card.parent
+        if card is not None and card.name is not None:
+            card_css = (
+                f"border-left:{gs['card_border']}; "
+                f"background-color:{gs['card_bg']}"
+            )
+            _append_inline_style(card, card_css)
+
 def render_wager_template(html, eid, eg, display_strength, selected_id):
     """Inject D1/D3 wager values into a QuestionText HTML clone."""
     soup = BeautifulSoup(html, "lxml")
     pay_c, pay_i = payouts(50)
 
     _set_attr(soup, "endorser_img", "src", ICON[eg])
+    apply_gender_style(soup, eg)
     _set_text(soup, "endorser_meta", f"ID {eid}")
     _set_text(soup, "selected_id",  selected_id)
     _set_attr(soup, "e_fill",       "style", f"width:{display_strength}%")
@@ -281,6 +381,7 @@ def render_outcome_template(html, eid, eg, display_strength, selected_id, varian
     realized = pay_c if is_correct else pay_i
 
     _set_attr(soup, "endorser_img",  "src", ICON[eg])
+    apply_gender_style(soup, eg)
     _set_text(soup, "endorser_meta", f"ID {eid}")
     _set_text(soup, "selected_id",   selected_id)
     _set_attr(soup, "e_fill",        "style", f"width:{display_strength}%")

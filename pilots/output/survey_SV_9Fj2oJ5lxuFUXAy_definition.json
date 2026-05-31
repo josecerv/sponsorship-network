@@ -1,7 +1,7 @@
 {
   "meta": {
     "httpStatus": "200 - OK",
-    "requestId": "ca94274c-dbd8-4f75-a963-0f20baf93820"
+    "requestId": "1be8ef6c-2110-4ad9-9fbd-570eafd562ae"
   },
   "result": {
     "QuestionCount": "72",
@@ -69,6 +69,7 @@
       "AvailableLanguages": {
         "EN": []
       },
+      "ProtectSelectionIds": true,
       "SurveyLanguage": "EN",
       "ActiveResponseSet": "RS_1BKxYYxtnx70xPE",
       "SurveyStartDate": null,
@@ -78,7 +79,7 @@
     "SurveyID": "SV_9Fj2oJ5lxuFUXAy",
     "SurveyName": "sponsor evaluator survey (3/24 changes)",
     "SurveyStatus": "Active",
-    "LastModified": "2026-03-31T15:36:42Z",
+    "LastModified": "2026-05-30T20:40:12Z",
     "BrandID": "wharton",
     "OwnerID": "UR_51kqMTaUzYIYveC",
     "LastAccessed": null,
