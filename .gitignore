@@ -30,6 +30,7 @@ Thumbs.db
 pilots/output/_qid*_current.json
 pilots/output/_*
 pilots/output/gdoc_backup.json
+pilots/output/gdoc_after_suggestions.json
 
 # Python cache
 __pycache__/
@@ -47,3 +48,6 @@ pilots/output/maurice_slide_images/
 pilots/output/pdf_extracted_figs/
 pilots/output/stage3_rendered_screens/all_conditions/
 pilots/output/temp_*.R
+
+# Local Qualtrics snapshots and response archives (may contain participant data)
+pilots/output/qualtrics_backups/

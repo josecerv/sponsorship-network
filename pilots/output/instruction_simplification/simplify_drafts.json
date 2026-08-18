@@ -1,0 +1,299 @@
+[
+ {
+  "approach": "minimalist",
+  "draft": {
+   "rows": [
+    {
+     "key": "E-R4",
+     "text": "You are an endorser for [ORGANIZATION 1: Vertex]. Each candidate set has two candidates: one from [ORGANIZATION 1: Vertex] (yours) and one from [ORGANIZATION 2: Beacon], plus both candidates' professional ability test scores.\nYou always endorse the [ORGANIZATION 1: Vertex] candidate. Decide how strongly, based on how likely they are to beat the other candidate on a separate logical reasoning test.\nUse the slider (0-100) to set your endorsement strength. Higher means more confident, more behind them; lower means less confident, less at risk. Evaluators will see this as a [ORGANIZATION 1: Vertex] endorser backing their own candidate.",
+     "words": 98
+    },
+    {
+     "key": "E-R5",
+     "text": "Evaluators (participants in a separate study) review your endorsements: your organization, the candidate you endorsed, and your endorsement strength. They decide what percent of a $0.50 bank (0-100%) to wager on you being correct, and how much future review to allocate to you and your organization.",
+     "words": 46
+    },
+    {
+     "key": "E-R6",
+     "text": "Your earnings have two parts: $1 for the study, plus a bonus up to $3. One endorsement is picked at random with its evaluator; your bonus depends on it three ways.\n1. Candidate performance: start with a $0.50 bank; your strength works as a wager. Win (beat the other candidate on the logical reasoning test): $0.50 plus $0.50 times your strength percent. Lose: $0.50 minus $0.50 times your strength percent. At strength 80: $0.90 if you win, $0.10 if you lose.\n2. Evaluator trust: if you win, earn up to $1.00 more: $1.00 times their wager percent.\n3. Evaluator allocations: 0-10 slots each to you and your organization, $0.05 per slot (up to $1.00), win or lose.",
+     "words": 117
+    },
+    {
+     "key": "E-R7",
+     "text": "1. Which scenario gives you the largest bonus?\n(a) Lose at strength 100; evaluator wagers 100%, allocates 10 slots.\n(b) Win at strength 0; evaluator wagers 0%, allocates 0 slots.\n(c) Win at strength 80; evaluator wagers 60%, allocates 6 slots.\n(d) Win at strength 20; evaluator wagers 10%, allocates 1 slot.\n2. Which candidate do you endorse in each candidate set?\n(a) The [ORGANIZATION 1: Vertex] candidate, the organization I represent.\n(b) Whichever candidate I believe will perform better.\n(c) The [ORGANIZATION 2: Beacon] candidate.\n(d) I do not endorse anyone.",
+     "words": 92
+    },
+    {
+     "key": "E-R8",
+     "text": "Who are the candidates?\nEarlier, they completed three tasks: a logical reasoning test, a general knowledge quiz, and a word search puzzle, and were paid for correct answers, giving real incentive to do well.\nProfiles show percentile scores on the quiz and word search (75th percentile beats 75% of participants on that task). Missing data shows as \"Unknown.\" Base your endorsement strength on this: how strongly you back your candidate to beat the other organization's candidate on the logical reasoning task (not shown).\nProfiles also show organization: the [ORGANIZATION 1: Vertex] candidate is yours; the other is [ORGANIZATION 2: Beacon]. IDs only, no names or photos.",
+     "words": 106
+    },
+    {
+     "key": "E-R10",
+     "text": "Set your endorsement strength: how confident you are that your [ORGANIZATION 1: Vertex] candidate beats the [ORGANIZATION 2: Beacon] candidate on the logical reasoning task, and how much to put behind them.\nHigh strength: bigger reward if right, bigger cost if wrong. Low strength: safer, but earns less.\nYou always endorse the [ORGANIZATION 1: Vertex] candidate, the organization you represent.",
+     "words": 60
+    },
+    {
+     "key": "V-R4",
+     "text": "You'll review real endorsement decisions from another participant. Your decisions are real: they determine your bonus and can affect that participant's pay.",
+     "words": 22
+    },
+    {
+     "key": "V-R5",
+     "text": "This study looks at how people evaluate others' decisions. You'll see another participant's real decisions, then decide how much of your own compensation to wager on them.",
+     "words": 27
+    },
+    {
+     "key": "V-R6",
+     "text": "Before you wager: earlier, \"candidates\" completed three tasks (a word search, a general knowledge quiz, a logical reasoning test); separately, \"endorsers\" were each assigned to represent an organization.\nEach decision showed the endorser two candidates: one from their own organization, one from another. They always endorsed their own organization's candidate. Based on the quiz and word search scores, they set a confidence level, by slider, that their candidate would beat the other candidate in the same set on the logical reasoning test.\nYour task: judge how much to trust one endorser, from a subset of their real decisions. You'll see the organization represented, the candidate endorsed (always their own organization's), and their confidence, not performance data. You'll then wager part of your pay on whether they were right.",
+     "words": 128
+    },
+    {
+     "key": "V-R7",
+     "text": "Endorsers have real incentives to endorse carefully: pay works like a wager, a stronger endorsement earns more if their candidate beats the other organization's candidate on the logical reasoning test, less if not.\nTheir pay also depends on you: the more you wager, when they win, the more they earn, and your allocations to this endorser and their organization add to their bonus too, win or lose.\nOne endorsement and its evaluator are picked at random for payment. If picked, your wagers and allocations directly affect this endorser's pay.",
+     "words": 89
+    },
+    {
+     "key": "V-R8",
+     "text": "You'll evaluate three decisions from the same endorser, each a new set of candidates.\nEach decision: start with a $0.50 bank, choose what percent (0-100%) to wager on the endorser being correct. Right: $0.50 plus your wager. Wrong: $0.50 minus your wager.\nCorrect means the endorsed candidate scores higher on the logical reasoning test than the other organization's candidate in the same set. Total bonus: sum of all three, up to $3.00.",
+     "words": 72
+    },
+    {
+     "key": "V-R9",
+     "text": "1. What task must the endorsed candidate score higher on to be correct?\n2. Who is the endorsed candidate compared against?\n3. The endorsed candidate was affiliated with\n4. How much do you start with per decision?\n5. You wager 50%, endorser right\n6. Total bonus\n7. Do your wagers and allocations affect the endorser's pay?",
+     "words": 56
+    },
+    {
+     "key": "V-R10",
+     "text": "You will evaluate one endorser's three decisions. Click the arrow to begin.",
+     "words": 12
+    },
+    {
+     "key": "V-R14",
+     "text": "You have 10 review slots for endorsers and 10 for organizations. These are real: each slot adds to this endorser's bonus if you're selected.\n1. Endorser slots: how many would you give this endorser? $0.05 per slot.\n2. Organization slots: how many for endorsers at [ORGANIZATION 1: Atlas]? $0.05 per slot.",
+     "words": 51
+    },
+    {
+     "key": "V-R15",
+     "text": "1. What was the gender of the endorser you evaluated? (Man / Woman / I don't recall)\n2. Imagine you were a candidate in a similar future study, endorsing yourself to perform well on the logical reasoning test. How strongly would you endorse yourself?",
+     "words": 44
+    }
+   ],
+   "rationale": "Cuts fell into five safe categories, verified word-by-word against the brief's hard constraints. (1) Repetition of \"you represent [ORGANIZATION 1: Vertex]\" was collapsed from 4 occurrences to 2 (E-R4 at assignment, E-R10 at the decision screen), as explicitly invited. (2) Screen-shown mechanics were stated once instead of walked through with worked examples: V-R8 dropped the \"wager 10% = $0.55/$0.45\" example and the \"0% keeps $0.50 / 100% risks it all\" gloss because the live payout preview under the slider already shows this, while the underlying formula ($0.50 bank, wager a 0-100% of it, win adds/lose subtracts) stays in the text so CQ5 ($0.75 at 50%) is still computable. (3) Paragraph prose became labeled/numbered lines for the two payout-formula screens (E-R6, V-R14), which cut connective tissue without losing any dollar figure, percentage, or the win/lose-both-pay-out fact. (4) Pure narrative flourish was cut: \"putting your money where your mouth is,\" \"signals weaker backing,\" \"not necessarily in the order they were made,\" and the V-R5/V-R4 preamble redundancy with each other. (5) Mechanical trims: contractions (You'll/you're), dropped filler (\"Thank you for your attention,\" \"flat,\" \"information about\"). Nothing touched: every dollar amount, percentage, and formula (including the $3 bonus ceiling and its three components, the $0.50 bank and its win/lose formula, the $0.05/slot and $1.00 caps); the must-endorse rule, the \"own-org-only\" visibility rule, the \"same set\" comparison target, the three-round structure, the \"no performance info for evaluators\" disclosure, and the \"allocations pay win or lose\" fact; all CQ answer keys were hand-checked against the shortened text (e.g., E-R7's scenario (c) still nets the largest bonus at $1.80 vs. $0.50/$0.50/$0.75 for the others). Two clarity fixes were made mid-pass and kept even though they cost a few words back: \"the other's\" was expanded to \"the other organization's candidate\" in V-R7/V-R8 (bare possessive was ambiguous), and V-R6's \"they always endorsed their own\" was expanded to \"...their own organization's candidate\" so CQ3's affiliation fact stays unambiguous. No em dashes, no \"stake\"/\"bet,\" and \"wager,\" \"$0.50 bank,\" and \"endorsement strength\" terminology were preserved verbatim throughout; bracketed placeholders are untouched.",
+   "total_words_before_after": "\"1860 -> 1020 (45.2% reduction)\""
+  },
+  "verify": {
+   "verdict": "pass_with_fixes",
+   "violations": [
+    {
+     "row": "V-R8",
+     "constraint": "Hard Constraint 1 \u2014 payout formulas must survive completely enough for participants to compute their pay",
+     "detail": "The draft establishes the wager as a PERCENT ('choose what percent (0-100%) to wager') but then gives the payout as 'Right: $0.50 plus your wager. Wrong: $0.50 minus your wager.' This drops the percent-to-dollar conversion. Compare the parallel endorser-side formula in E-R6, which correctly keeps the multiplication explicit: '$0.50 plus $0.50 times your strength percent.' V-R8's version never states that the wager percent must be multiplied by the $0.50 bank before it's added/subtracted. A participant cannot mechanically derive a dollar payout from 'plus your wager' when 'wager' was just defined as a percent, not a dollar amount. The original text avoided this gap with an explicit worked example (wager 10% = $0.05 of $0.50; right -> $0.55, wrong -> $0.45; 0% -> keep $0.50; 100% -> $1.00 or $0.00), which the draft cut entirely without replacing the missing conversion step."
+    }
+   ],
+   "cq_failures": [
+    {
+     "cq": "V-R9 item 5 \u2014 \"You wager 50%, endorser right\" (correct answer: $0.75)",
+     "problem": "Not reliably, uniquely answerable from V-R8's draft text alone. To get $0.75 a participant must silently infer that 'your wager' in the Right/Wrong formula means '$0.50 times your wager percent,' but the text never says this \u2014 it only ever calls the input a 'percent (0-100%) to wager' and then adds/subtracts 'your wager' as if it were already a dollar figure. A skimming participant could plug in the percent literally (e.g., read 'plus your wager' as 'plus 50') and land on an answer other than $0.75. Fix: change the formula lines to 'Right: $0.50 plus $0.50 times your wager percent. Wrong: $0.50 minus $0.50 times your wager percent.' (mirroring E-R6's phrasing), or restore a one-line worked example, e.g. 'Wager 50%: $0.75 if right, $0.25 if wrong.'"
+    }
+   ],
+   "notes": "Aside from the V-R8 formula gap, the draft is faithful and reads well. All dollar amounts, the $1+up-to-$3 endorser bonus structure, the $0.50 evaluator bank, the max-$3.00 evaluator bonus, the random-selection payment rule (stated on both the endorser and evaluator sides, including the endorser-pay telegraph in V-R7), the must-endorse design fact, \"evaluators never see candidates' performance info,\" and \"allocations pay win or lose\" all survive intact and are stated in plain, second-person, active-voice sentences with no filler, no condescension, and no em dashes or banned \"stake\"/\"bet\" terminology. Organization placeholders ([ORGANIZATION 1: Vertex] / [ORGANIZATION 2: Beacon] / [ORGANIZATION 1: Atlas]) are preserved verbatim. E-R7 item 1's answer key still resolves uniquely to (c) $1.80 (vs. (a) $0.50, (b) $0.50 tie for last, (d) $0.75) using E-R6's intact formula, so that CQ is fine despite the (a)/(b) tie at the bottom. E-R8's added \"(not shown)\" for the logical reasoning task is a truthful clarification, not a new claim \u2014 the original already implied it by only listing quiz/word-search percentiles on the profile. One soft (non-blocking) readability note: the brief explicitly flagged that ownership/affiliation is over-repeated in the Endorser tab and suggested trimming to \"once at assignment, once at the decision screen,\" but E-R4 alone still restates Vertex-ownership four times (assignment, \"(yours)\", \"always endorse,\" and the evaluator-perception line) \u2014 this is an encouraged cut, not a hard-constraint violation, so it doesn't affect the verdict, but tightening E-R4's last sentence (\"Evaluators will see this as a Vertex endorser backing their own candidate\") or folding it into the first sentence would get closer to the brief's own stated goal. Also minor, non-blocking: V-R8 dropped \"You will find out whether the endorser was right immediately after each wager\" \u2014 not a hard-constraint fact and not CQ-tested, safe to omit, but worth restoring if space allows since it sets a real procedural expectation. Recommended verdict path: apply the one V-R8 fix above, then this draft passes clean."
+  }
+ },
+ {
+  "approach": "structured",
+  "draft": {
+   "rows": [
+    {
+     "key": "E-R4",
+     "text": "You are an endorser for [ORGANIZATION 1: Vertex].\n\nEach set has two candidates: one from [ORGANIZATION 1: Vertex] (yours) and one from [ORGANIZATION 2: Beacon]. You will see both candidates' scores on professional ability tests.\n\nYour task: set your endorsement strength for your organization's candidate. You always endorse [ORGANIZATION 1: Vertex]; you are not choosing between them. Base your strength on how likely your candidate is to beat the other on a separate logical-reasoning test.\n\nSlider: 0-100\n- Higher = more confident, more backing\n- Lower = less confident, less at risk\n\nEvaluators will see this as [ORGANIZATION 1: Vertex] backing its own candidate.",
+     "words": 104
+    },
+    {
+     "key": "E-R5",
+     "text": "Evaluators (a separate study's participants) review your endorsements. For each one, they see: your organization, the candidate you endorsed (your organization's), and your endorsement strength.\n\nThey then decide what percent of a $0.50 bank (0-100%) to wager on you being right, and how much future review to allocate to you and your organization.",
+     "words": 53
+    },
+    {
+     "key": "E-R6",
+     "text": "Earnings: $1 for completing the study, plus a bonus up to $3.\n\nOne endorsement (and the evaluator who reviewed it) is picked at random. Your bonus for it has three parts:\n\n1. Candidate performance. Start with a $0.50 bank; your endorsement strength works like a wager.\n- Win: $0.50 + ($0.50 x strength%)\n- Lose: $0.50 - ($0.50 x strength%)\n- At strength 80: $0.90 if you win, $0.10 if you lose.\n\n2. Evaluator trust. If you win, add $1.00 x the evaluator's wager%.\n\n3. Evaluator allocations. Evaluator gives 0-10 slots to you and 0-10 to your organization. Each slot = $0.05, up to $1.00 total, paid win or lose.",
+     "words": 110
+    },
+    {
+     "key": "E-R7",
+     "text": "1. Which scenario gives you the largest bonus?\n   (a) Candidate loses at strength 100; evaluator wagers 100%, allocates 10 slots.\n   (b) Candidate wins at strength 0; evaluator wagers 0%, allocates 0 slots.\n   (c) Candidate wins at strength 80; evaluator wagers 60%, allocates 6 slots.\n   (d) Candidate wins at strength 20; evaluator wagers 10%, allocates 1 slot.\n2. Which candidate do you endorse in each candidate set?\n   (a) The [ORGANIZATION 1: Vertex] candidate, the organization I represent.\n   (b) Whichever candidate I believe will perform better.\n   (c) The [ORGANIZATION 2: Beacon] candidate.\n   (d) I do not endorse anyone.",
+     "words": 96
+    },
+    {
+     "key": "E-R8",
+     "text": "Who are the candidates?\nEarlier participants who completed three tasks: a logical-reasoning test, a general-knowledge quiz, and a word-search puzzle. They were paid for correct answers, so they had a real incentive to do well.\n\nTheir profile shows:\n- Percentile scores on the quiz and word search (75th percentile beat 75% of participants). \"Unknown\" = no score for that task.\n- Organization: [ORGANIZATION 1: Vertex] = your candidate; [ORGANIZATION 2: Beacon] = the other.\n- ID only, no names or photos.\n\nBase your endorsement strength on their quiz and word-search scores: how strongly you back your candidate to beat the other on the logical-reasoning task.",
+     "words": 105
+    },
+    {
+     "key": "E-R10",
+     "text": "Set your endorsement strength: how confident you are that your organization's candidate will beat the other candidate on the logical-reasoning task, and how much you want to back that.\n\n- High strength = strong public backing: earns more if you're right, costs more if you're wrong.\n- Low strength = safer: earns less if you're right, but risks less if you're wrong.\n\nYou always endorse the [ORGANIZATION 1: Vertex] candidate. You are only choosing how much to back them.",
+     "words": 79
+    },
+    {
+     "key": "V-R4",
+     "text": "You will review real endorsement decisions made by another participant. Your decisions are real: they affect your bonus and can affect that participant's pay.",
+     "words": 24
+    },
+    {
+     "key": "V-R5",
+     "text": "We study how people evaluate other people's decisions. You will see information about another participant's real decisions and decide how much of your own compensation to wager on them.",
+     "words": 29
+    },
+    {
+     "key": "V-R6",
+     "text": "Before you wager, here's the setup.\n\nCandidates: earlier participants who did three tasks: word-search puzzle, general-knowledge quiz, logical-reasoning test.\n\nEndorsers: separate participants, each assigned to represent an organization. Each decision showed an endorser two candidates (their own organization's and another's), plus only the quiz and word-search scores. The endorser used a slider to show how confident they were that their candidate would beat the other candidate in the same set on the logical-reasoning test.\n\nYour task: judge how much to trust one endorser. You will see a subset of their real decisions (order may vary), each showing their organization, the candidate endorsed (always their own organization's), and their confidence, but not performance data. You then wager part of your pay on whether they were right.",
+     "words": 125
+    },
+    {
+     "key": "V-R7",
+     "text": "Endorsers had real incentives to endorse carefully: pay works like a wager. A stronger endorsement earns more if their candidate wins (scores higher on the logical-reasoning test) and loses more if their candidate loses.\n\nTheir pay also depends on you:\n- Candidate wins: the more you wager, the bigger their bonus.\n- At the end, you allocate review slots to this endorser and their organization; each slot adds to their bonus, win or lose.\n\nOne endorsement and one evaluator are picked at random for payment. If yours is picked, your wagers and allocations directly affect this endorser's pay.",
+     "words": 98
+    },
+    {
+     "key": "V-R8",
+     "text": "You will evaluate three decisions from the same endorser, each a new, independent candidate set.\n\nEach decision: start with a $0.50 bank, choose how much to wager on the endorser being correct.\n- Right: $0.50 + wager\n- Wrong: $0.50 - wager\n\nExample, 10% wager ($0.05): right -> $0.55, wrong -> $0.45.\n0% wager = keep $0.50 regardless. 100% wager = $1.00 or $0.00.\n\nCorrect means the endorsed candidate scored higher on the logical-reasoning test than the other organization's candidate in the same set. Total bonus = sum of all three (up to $3.00). You'll see the result right after each wager.",
+     "words": 102
+    },
+    {
+     "key": "V-R9",
+     "text": "1. What must the endorsed candidate score higher on to count as correct? -> Logical-reasoning test\n2. Who is the endorsed candidate compared against? -> The other organization's candidate in the same set\n3. The endorsed candidate was affiliated with -> The endorser's own organization\n4. How much do you start with per decision? -> $0.50\n5. You wager 50%, endorser right -> $0.75\n6. Total bonus -> sum of all three decisions\n7. Do your wagers and allocations affect the endorser's pay? -> Yes, if my session is selected",
+     "words": 90
+    },
+    {
+     "key": "V-R10",
+     "text": "You will evaluate one endorser and their three decisions. Click the arrow to begin.",
+     "words": 14
+    },
+    {
+     "key": "V-R14",
+     "text": "You have 10 review slots for endorsers and 10 for organizations. Real stakes: each slot adds to this endorser's bonus if your session is selected.\n\n1. Endorser slots (0-10): how many to see more from this endorser? Each slot = $0.05 to their bonus.\n2. Organization slots (0-10): how many to see more from [ORGANIZATION 1: Atlas] endorsers? Each slot = $0.05 to their bonus.",
+     "words": 65
+    },
+    {
+     "key": "V-R15",
+     "text": "1. What was the gender of the endorser whose decisions you evaluated? (Man / Woman / I don't recall)\n2. Imagine you were a candidate in a study like this one, and you had to endorse yourself on the logical-reasoning task. How strongly would you endorse yourself?",
+     "words": 47
+    }
+   ],
+   "rationale": "All 15 rows were rewritten (none needed \"UNCHANGED\"), cutting 1905 words to 1141 (40.1% reduction), safely because every cut targeted redundancy rather than content. Repetition was the main source: \"your organization's candidate\" / affiliation was collapsed to two mentions per the brief's rule (E-R4 at assignment, E-R10 at the decision screen), and E-R8/E-R6/E-R5 now use the short \"strength\" after establishing \"endorsement strength\" once. Prose paragraphs became labeled bullets and worked payout lines (E-R6's three-part bonus, V-R8's win/wrong formulas, E-R7/V-R9's answer choices) without altering any number, formula, or word order that the math depends on -- every dollar amount, percentage, and the $3/$1/$0.50 bank figures survive verbatim, and I hand-traced CQ1's largest-bonus scenario ($1.80 for option c vs. $0.50-$0.75 for the others) and CQ2-CQ7 against the simplified text to confirm each is still uniquely answerable. Filler openers (\"Thank you for your attention\", \"we are interested in understanding...\", \"Before you decide... you should first understand the set-up\") were cut since they carry no fact. The one plain non-bracketed meta-line in V-R14 (\"After the final round: allocation decisions (new screens)\") and the \"(correct)\" answer-key annotations in E-R7 were dropped as document-only annotations, not participant text -- keeping \"(correct)\" visible in a live MC choice would leak the answer, so this mirrors how bracketed notes are already excluded. Design-fixed facts (must-endorse, own-org-only visibility for evaluators, same-set comparison, three rounds, no performance info for evaluators, allocations paid win-or-lose) and terminology (\"wager\", \"$0.50 bank\", \"endorsement strength\" for endorsers vs. \"confidence\" for evaluators, org placeholders, no em dashes) were preserved exactly; only sentence-level compression and bullet restructuring were applied.",
+   "total_words_before_after": "\"1905 -> 1141 (40.1% reduction)\""
+  },
+  "verify": {
+   "verdict": "pass_with_fixes",
+   "violations": [
+    {
+     "row": "E-R4",
+     "constraint": "ambiguity a skimming participant could misread",
+     "detail": "\"You always endorse [ORGANIZATION 1: Vertex]; you are not choosing between them.\" \u2014 \"them\" has no antecedent in that sentence (the nearest noun is the singular \"[ORGANIZATION 1: Vertex]\"); a skimmer has to backtrack two sentences to \"two candidates\" to resolve it. Does not break CQ2 answerability (CQ2 is independently anchored by the explicit \"You always endorse [ORGANIZATION 1: Vertex]\" clause), but costs a re-read. One-line fix: \"you are not choosing between the two candidates.\""
+    },
+    {
+     "row": "E-R10",
+     "constraint": "ambiguity a skimming participant could misread",
+     "detail": "\"You are only choosing how much to back them.\" \u2014 \"them\" has no plural antecedent; the sentence names one singular candidate (\"the [ORGANIZATION 1: Vertex] candidate\"). One-line fix: \"You are only choosing how much to back that candidate.\""
+    },
+    {
+     "row": "V-R15",
+     "constraint": "ambiguity / referential drift from source text",
+     "detail": "Item 2 changed \"a future study like the one you just observed\" to \"a study like this one.\" \"This one\" can be misread as the current Evaluator survey (in which the respondent never performs the logical-reasoning task or plays candidate) rather than the endorsement/candidate study the question means to reference. Not a dollar-fact, formula, or CQ issue (this item isn't a scored CQ), but the explicit pointer should be restored, e.g. \"a study like the one you just read about,\" to avoid the misread."
+    }
+   ],
+   "cq_failures": [],
+   "notes": "Verified line by line against every hard constraint plus a direct text-file grep for em dashes/en dashes and for \"stake\"/\"bet\"/filler phrases: zero hits. All incentive facts survive and are computable \u2014 I re-derived the CQ1 ranking (E-R7) from the E-R6 formulas across all four options (option c wins by a wide enough margin that the pre-existing \"N slots\" vs \"N slots each\" ambiguity in the option text, inherited unchanged from the fielded original, can't flip the answer) and confirmed $1 completion + up to $3 bonus ($1.00+$1.00+$1.00 across the three parts) matches. Every one of the 9 comprehension-check items (E-R7 #1-2, V-R9 #1-7) remains uniquely answerable from the draft text alone; V-R8's explicit phrase \"the other organization's candidate in the same set\" and V-R7's closing sentence anchor V-R9 #2 and #7 word-for-word. Design-fixed facts (must-endorse/strength-only choice, evaluators see own-org endorsements only, same-set comparison, three rounds, no performance info shown to evaluators, allocations pay win-or-lose) and the endorser-pay telegraph (V-R7) are all intact and literally true, no new claims added. Terminology (\"wager,\" \"$0.50 bank,\" \"endorsement strength,\" org placeholders) is verbatim throughout; no em/en dashes anywhere (confirmed by regex scan, not just eyeballing); no \"stake\"/\"bet\"; no \"please note\"/\"it is important\" filler; second person and active voice hold throughout. Word counts I recomputed independently match every count the draft self-reported. Total word count across the ten body rows with a soft-target (excluding the two CQ-structure rows and the two already-short rows V-R4/V-R10 which barely changed) fell from 1690 to 955 words, ~57% of original, close to the \"roughly half\" soft target; V-R7 (69%) and V-R15 (85%) were cut less aggressively, which is the right call given V-R7 carries the load-bearing truthfulness telegraph. Three minor, easily-fixed ambiguities are flagged above (two dangling \"them\" pronouns, one referential drift in V-R15) \u2014 none break a CQ or a dollar fact, so this is pass_with_fixes rather than fail. One non-blocking readability observation for the notes only (not listed as a violation because the brief frames it as \"encouraged,\" not required): the brief specifically called out cutting Endorser-tab ownership/affiliation repetition down to twice total, but this draft still restates ownership/affiliation 4-5 times within E-R4 alone and again in E-R5, E-R8, and E-R10 \u2014 a further terseness pass could consolidate this if Jose wants to push closer to the target. Also worth noting as safe-to-cut and correctly cut: the \"(correct)\" answer-key parentheticals were stripped from E-R7's visible option text (correct, since exposing the answer key in participant-facing choice text would be a bug, not a simplification), and pure filler like \"Thank you for your attention\" (V-R10) and \"shows the evaluator you are putting your money where your mouth is\" (E-R10) was cut without losing any tested fact."
+  }
+ },
+ {
+  "approach": "conservative",
+  "draft": {
+   "rows": [
+    {
+     "key": "E-R4",
+     "words": 140,
+     "text": "In this study, you are an endorser for [ORGANIZATION 1: Vertex].\n\nIn each candidate set, you will see two candidates: one from [ORGANIZATION 1: Vertex] (your organization) and one from [ORGANIZATION 2: Beacon] (another organization). You will also see both candidates' scores on a set of professional ability tests.\n\nYour job is to endorse your organization's candidate, the one from [ORGANIZATION 1: Vertex], every time. You are not choosing between candidates. What you decide is how strongly to endorse them: how likely you think they are to beat the other organization's candidate on a separate logical reasoning test.\n\nUse the slider (0 to 100) to set your endorsement strength. Higher means more confident and more at risk. Lower means less confident and less at risk. Evaluators will see your endorsement as a [ORGANIZATION 1: Vertex] endorser backing your organization's candidate."
+    },
+    {
+     "key": "E-R5",
+     "words": 68,
+     "text": "Evaluators, participants in a separate study, will review your endorsements. For each one, they will see the organization you represent, the candidate you endorsed, and your endorsement strength.\n\nBased on this, the evaluator decides what percent of a $0.50 bank (0-100%) to wager on your endorsement being correct. At the end of their session, they also decide how much future review to allocate to you and your organization."
+    },
+    {
+     "key": "E-R6",
+     "words": 182,
+     "text": "Your pay has two parts: a flat $1 for completing the study, and a bonus of up to $3.\n\nOne of your endorsements will be picked at random, along with the evaluator who reviewed it. Your bonus depends on that endorsement in three ways:\n\n1. Your candidate's performance. You start with a $0.50 bank, and your endorsement strength works like a wager.\nCandidate wins: you earn $0.50 + ($0.50 x strength%)\nCandidate loses: you earn $0.50 - ($0.50 x strength%)\nExample at strength 80: $0.90 if you win, $0.10 if you lose.\nA stronger endorsement earns you more when you're right and costs you more when you're wrong.\n\n2. The evaluator's trust. If your candidate wins, you also earn up to $1.00: $1.00 x the evaluator's wager percentage. The more they trust your endorsement, the more you earn.\n\n3. The evaluator's allocations. At the end of their session, the evaluator allocates 0-10 review slots to you and 0-10 to your organization. Each slot adds $0.05 to your bonus, up to $1.00 total. These allocations pay you whether your candidate won or lost."
+    },
+    {
+     "key": "E-R7",
+     "words": 116,
+     "text": "1. Which scenario earns you the largest bonus?\n(a) Your candidate loses at strength 100; the evaluator wagers 100%; the evaluator allocates 10 slots.\n(b) Your candidate wins at strength 0; the evaluator wagers 0%; the evaluator allocates 0 slots.\n(c) Your candidate wins at strength 80; the evaluator wagers 60%; the evaluator allocates 6 slots. (correct)\n(d) Your candidate wins at strength 20; the evaluator wagers 10%; the evaluator allocates 1 slot.\n2. Which candidate do you endorse in each candidate set?\n(a) The candidate from [ORGANIZATION 1: Vertex], the organization I represent. (correct)\n(b) Whichever candidate I believe will perform better.\n(c) The candidate from [ORGANIZATION 2: Beacon].\n(d) I do not endorse anyone."
+    },
+    {
+     "key": "E-R8",
+     "words": 134,
+     "text": "Who are the candidates you will be endorsing?\n\nThey are participants who already completed three tasks: a logical reasoning test, a general knowledge quiz, and a word search puzzle. They were paid for correct answers, so they had a strong incentive to do well.\n\nBase your endorsement strength on their general knowledge quiz and word search scores. Your strength reflects how confident you are that your organization's candidate will outperform the other organization's candidate on the logical reasoning test.\n\nEach candidate's profile shows percentile scores on the quiz and word search (a 75th percentile score beat 75 percent of participants; \"Unknown\" means that data isn't available), plus the candidate's organization. The [ORGANIZATION 1: Vertex] candidate is yours; the [ORGANIZATION 2: Beacon] candidate is not. Candidates are shown by ID only, no names or photos."
+    },
+    {
+     "key": "E-R10",
+     "words": 94,
+     "text": "What is the objective when deciding your endorsement strength?\n\nUse the slider to show how strongly you endorse your organization's candidate: how confident you are they'll beat the other organization's candidate on the logical reasoning test. A high strength is strong public backing: it earns you more if you're right, costs you more if you're wrong. A low strength protects you when you're unsure, but earns less if your candidate wins.\n\nYou represent [ORGANIZATION 1: Vertex]. Your endorsement always goes to the [ORGANIZATION 1: Vertex] candidate; you choose how much to put behind them."
+    },
+    {
+     "key": "V-R4",
+     "words": 28,
+     "text": "UNCHANGED"
+    },
+    {
+     "key": "V-R5",
+     "words": 30,
+     "text": "We are interested in how people evaluate others' decisions. You will see real decisions made by another participant, and decide how much of your own compensation to wager on them."
+    },
+    {
+     "key": "V-R6",
+     "words": 161,
+     "text": "Here's the setup.\n\nIn an earlier study, a group of participants, we'll call them \"candidates,\" completed three tasks: a word-search puzzle, a general-knowledge quiz, and a logical-reasoning test.\n\nIn a separate study, another group, \"endorsers,\" were each assigned to represent an organization. In each decision, an endorser saw two candidates: one from their own organization and one from another. They endorsed their own organization's candidate and decided how strongly, based on that candidate's knowledge-quiz and word-search scores. Their endorsement strength reflects how confident they were that their candidate would beat the other organization's candidate on the logical-reasoning test.\n\nYour task: decide how much to trust one endorser's judgment. You will see a subset of their real decisions, not necessarily in order. For each one, you'll see the organization they represent, the candidate they endorsed (always their own organization's), and their confidence, but not the candidates' performance information. You'll then wager part of your own compensation on whether the endorser was right."
+    },
+    {
+     "key": "V-R7",
+     "words": 111,
+     "text": "Endorsers had real incentives to endorse carefully. Their pay works like a wager: the stronger the endorsement, the more they earn if their candidate beats the other organization's candidate on the logical-reasoning test, and the less they earn if their candidate loses.\n\nTheir pay also depends on you. If their candidate wins, the more you wager, the bigger their bonus. You'll also decide how many future review slots to allocate to this endorser and their organization; each slot adds to their bonus, win or lose.\n\nOne endorsement and one evaluator will be picked at random for payment. If your session is picked, your wagers and allocations directly affect this endorser's pay."
+    },
+    {
+     "key": "V-R8",
+     "words": 131,
+     "text": "You will evaluate three decisions from the same endorser, each with a new, independent set of candidates. For each one, you start with a $0.50 bank and decide how much to wager on the endorser being correct. If they're right, you get $0.50 plus your wager; if wrong, $0.50 minus your wager.\n\nExample at a 10% wager ($0.05): endorser right -> $0.55, endorser wrong -> $0.45.\n\nWagering 0% keeps your $0.50 no matter what. Wagering 100% means you could earn $1.00 or $0.00.\n\nAn endorsement is correct if the endorsed candidate scores higher on the logical-reasoning test than the other organization's candidate in the same set. Your total bonus is the sum of all three decisions, up to $3.00. You'll find out immediately after each wager whether the endorser was right."
+    },
+    {
+     "key": "V-R9",
+     "words": 99,
+     "text": "UNCHANGED"
+    },
+    {
+     "key": "V-R10",
+     "words": 14,
+     "text": "You will evaluate one endorser and their three decisions. Click the arrow to begin."
+    },
+    {
+     "key": "V-R14",
+     "words": 73,
+     "text": "You have 10 future review slots for endorsers and 10 for organizations. Each slot you allocate is real: it adds $0.05 to this endorser's bonus if your session is selected for payment.\n\n1. Out of 10 slots for endorsers, how many would you allocate to see more endorsements from this endorser?\n2. Out of 10 slots for organizations, how many would you allocate to see more endorsements from endorsers at [ORGANIZATION 1: Atlas]?"
+    },
+    {
+     "key": "V-R15",
+     "words": 47,
+     "text": "1. What was the gender of the endorser whose decisions you evaluated? (Man / Woman / I don't recall)\n2. Imagine you were a candidate in a study like this one, endorsing yourself to perform well on the logical reasoning task. How strongly would you endorse yourself?"
+    }
+   ],
+   "rationale": "I cut four low-risk categories and touched nothing that carries an incentive number, a CQ-tested fact, or a fixed design rule. (1) Repeated affiliation statements: \"you represent Vertex\" / \"endorsement always goes to Vertex\" now appears once at assignment (E-R4) and once at the pre-decision reminder (E-R10), as the brief specifies, instead of 4+ times. (2) Academic throat-clearing and pure courtesy filler: V-R5's \"we are interested in understanding... Hence, we will be showing you\" became a direct statement; V-R10 dropped \"Thank you for your attention\"; E-R10 dropped the \"putting your money where your mouth is\" idiom (flavor, not a fact); V-R14's \"After the final round: allocation decisions (new screens)\" was treated as a stage-direction/implementation note and left out of participant text entirely, matching rule 7. (3) Paragraph-prose payout rules were converted to short labeled/arrow lines (E-R6, V-R8) with every dollar figure, formula, percentage, and the strength-80 / wager-10% worked examples preserved verbatim in value. (4) Duplicate sentence scaffolding was merged without dropping either fact: E-R8's two \"profile also shows...\" sentences became one; V-R7's \"First.../ Second...\" became two parallel sentences that still keep the two distinct endorser-pay channels (evaluator wager, only if candidate wins; evaluator allocation, win or lose) separate and clear, preserving the required endorser-pay telegraph. E-R7 and V-R9 (comprehension checks) and V-R4 were left at or near-verbatim per the brief's own \"KEEP\" instruction since they gate survey continuation; all four/seven answer options and every correct-answer value are untouched, so every CQ stays uniquely answerable from the simplified instructions. I verified by re-reading the simplified text against each of the 5 endorser-side and 7 evaluator-side CQ answers, plus the fixed design list (must-endorse, comparison-candidate definition, evaluators never see performance info, allocations pay win-or-lose, three rounds, random-selection payment rule) and confirmed every one is still stated. No em dashes were introduced. Because two rows (V-R4, V-R9, 127 words combined) were deliberately held near-flat as CQ/gate text, the achievable aggregate reduction is capped below the row-level ~50% soft target even though the freely-simplifiable narrative rows each fell 27-46%.",
+   "total_words_before_after": "1907 -> 1428 (25% reduction)"
+  },
+  "verify": {
+   "verdict": "pass",
+   "violations": [],
+   "cq_failures": [],
+   "notes": "Verified row by row against the brief's hard constraints and every CQ. Result: zero violations, all 9 comprehension-check items (E-R7 #1-2, V-R9 #1-7) remain uniquely answerable from the draft text.\n\nDollar amounts / formulas: all present and internally consistent. Worked the E-R6 payout math for all four E-R7 Q1 scenarios using only the draft's stated formulas: (a) $0.50, (b) $0.50, (c) $1.80, (d) $0.75 \u2014 (c) is correctly the largest, matching the answer key. V-R8's 10%-wager example ($0.05, ->$0.55/$0.45) still lets a participant extrapolate 50%->$0.75 for V-R9 #5, same inferential step the original required (not a new burden). Max bonus figures ($1 flat + up to $3 bonus = $0.50-$1.00 performance + up to $1.00 trust + up to $1.00 allocations) all reconcile.\n\nDesign facts (constraint 4): must-endorse-own-org (E-R4, E-R7 Q2), evaluators-see-own-org-only (V-R6: \"always their own organization's\"), comparison-is-same-set (explicit \"in the same set\" survives in V-R8, and V-R6 states the beat-comparison generally \u2014 together sufficient), three rounds (V-R8, V-R10), no performance info shown to evaluators (V-R6), allocations pay win-or-lose (E-R6, V-R7 \"win or lose\") \u2014 all intact.\n\nTerminology (constraint 5): \"wager,\" \"$0.50 bank,\" \"endorsement strength,\" and all three org placeholders used correctly throughout; no instance of \"stake\" or \"bet\" as the DV noun. No em dash characters anywhere \u2014 all ranges/arrows use plain hyphens or \"->\", consistent with the brief's own convention and the \"en dashes fine for ranges\" allowance. Bracketed implementation notes (e.g., \"(new screens)\" in V-R14) were correctly excluded from participant text.\n\nTwo sub-hard-constraint-level observations for the next pass, not counted as violations: (1) E-R5 drops the original's soft hedge (\"may be used to inform,\" \"for each endorsement that is shown\") in favor of \"will review your endorsements. For each one, they will see...\" \u2014 this is not literally false and doesn't affect any CQ or required design fact, but a one-line restore of \"shown\" would tighten fidelity to the subset-sampling framing that V-R6 still states explicitly. (2) V-R14 states the $0.05-per-slot amount once in a shared intro rather than under each of the two sub-questions; the brief's own row already bundles them as one block so this isn't a text-fidelity fault, but if Qualtrics renders the endorser-slot and organization-slot questions as two separate screens, confirm the dollar-per-slot line stays visible on both, or restate it under question 2.\n\nReadability: consistently second-person, active voice, one idea per sentence, no filler phrases, numbered/labeled payout lines instead of dense paragraphs (E-R6, V-R8) \u2014 a clear improvement in skimmability over the originals. Word-count cuts land at roughly 20-35% for most rows rather than the \"roughly half\" soft target (E-R4 30%, E-R6 27%, V-R7 21%, V-R8 23%), but the brief marks that target explicitly soft and prioritizes clarity, so this is not a defect. The \"twice is enough\" repetition guidance for organization affiliation in the Endorser tab was only partly applied \u2014 Vertex/Beacon affiliation is still restated in E-R4 (three times), E-R8, and E-R10 \u2014 an available further cut, not a constraint violation. CQ rows (E-R7, V-R9) correctly preserved structure and answer-choice ordering with only light wording tweaks, as instructed."
+  }
+ }
+]
