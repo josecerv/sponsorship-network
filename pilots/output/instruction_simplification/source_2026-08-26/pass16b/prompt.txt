@@ -1,0 +1,36 @@
+You are the WRITER of participant-facing survey instructions (Prolific). You wrote in/Stage-3.md a moment ago. The
+architect accepted everything except Page 6B, which came out too compressed: short clipped clauses ("Set this
+representative’s chance: 0% means certainly different; 100%, certainly this one.", "Farther from 50% costs more; you
+keep the rest.", "The screen shows your cost.") read like notes, not instructions. The PI asked for SIMPLER, which
+means plain, complete sentences a hurried reader gets on the first pass, not fewer words. Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass16b\
+(read in/, write out/). Touch no other file anywhere.
+
+Read in/Stage-3.md completely. Write out/Stage-3.md byte-identical to it EXCEPT the body of "# PAGE 6B: CHOOSE YOUR
+FINAL REPRESENTATIVE", which you rewrite as follows (110-140 words of prose plus the unchanged price list and the
+unchanged check item; three short paragraphs of plain sentences):
+
+Paragraph 1 (what is chosen): your final review can come from this same representative or from a different
+representative, drawn at random; you choose how likely it is to be this representative, where 0% means certainly a
+different one and 100% means certainly this one.
+Paragraph 2 (the price): you receive $0.15 for this page; if you leave the slider at 50%, a coin flip decides and the
+page costs you nothing, so you keep the whole $0.15; the further you move the slider from 50%, the more it costs, and
+whatever you do not spend is yours. Then the price list exactly as it is now (six "- " lines). Then one sentence: the
+screen shows the cost of the setting you pick.
+Paragraph 3 (the draw and the bonus): the computer then makes one random draw, using the chance you set, and that
+decides who your final review comes from; this choice does not affect the representative's bonus.
+Then the check item exactly as it is now (stem, three options, key line).
+
+Architect's reference draft (use it, improve it, or rewrite it; every fact must survive):
+"Your final review can come from this same representative or from a different representative, drawn at random. You
+choose how likely it is to be this representative: 0% means certainly a different one, and 100% means certainly this
+one. / You receive $0.15 for this page. If you leave the slider at 50%, a coin flip decides and the page costs you
+nothing, so you keep the whole $0.15. The further you move the slider from 50%, the more it costs, and whatever you
+do not spend is yours. [list] The screen shows the cost of the setting you pick. / The computer then makes one random
+draw, using the chance you set, and that decides who your final review comes from. This choice does not affect the
+representative's bonus."
+
+Rules: typographic quotes only; no em dashes; no straight quotes; bold only on amounts and percentages as in the
+file; no "budget", "bet", "wager", "stake", "bank"; every "# " line byte-identical; nothing outside Page 6B changes.
+Write out/notes.md: one line with the Page 6B prose word count (excluding the list and the check item).
+Final chat reply: one line.

@@ -1,0 +1,34 @@
+You are the independent REVIEWER of a draft of participant-facing survey instructions for a behavioral experiment on
+Prolific (a different Codex session wrote the draft; you did not). Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass15_review\
+(read in/, write out/). Touch no other file anywhere.
+
+Read ALL of these first, completely, in this order:
+1. in/jose_comments_2026-08-25.md   (what the principal investigator and his advisor asked for)
+2. in/architecture_pass15.md         (the architect's brief; section 7 at the end is the controlling spec)
+3. in/decision_memo.md               (the review panel's memo; section 7 of the brief overrides it where they differ)
+4. in/live_cells_2026-08-26.md       (the live Google Doc text before this draft; the PI's own hand edits are in it)
+5. in/Stage-2.md, in/Stage-3.md, in/ui_strings.md, in/notes.md   (THE DRAFT under review)
+
+Then write out/review.md (under 900 words) with exactly these sections:
+A. SERVES THE ASK? For each of the three requests (onboarding / scrutiny early; placement as referral confidence, less
+   like betting, telegraph the preferences; incentivize the ask with a pay-to-shift-the-chance choice), say in two or
+   three sentences whether the draft delivers it, quoting the sentences that do the work, and what a reader would
+   still miss.
+B. TRUTHFULNESS. List every sentence in Stage-2.md and Stage-3.md that could be false at fielding time or that promises
+   more than the mechanism in section 7 of the brief delivers. For each: quote it, say why, give the minimal truthful
+   rewording. Pay special attention to: "can spend money to shift that chance", "Your decisions shape the view they
+   form", "makes reviewers more willing to follow your next referral and to choose you again", the Stage 2 Page 4
+   reviewer clause, the choice page (Page 6B) mechanics, "affects only which representative", the final review page,
+   and the Stage 3 Page 2 telegraph.
+C. CONSISTENCY. Where Stage 2 and Stage 3 describe the same thing differently (what reviewers do, what the
+   representative knew, organizations, the bonus), quote both and say which to change.
+D. CLARITY FOR A HURRIED PROLIFIC READER. The five sentences most likely to be misread, each with a rewrite. Judge the
+   Page 6B price list and the check item: can a reader get it right from the page alone?
+E. STYLE RULES. Any violation of: prose inside pages, each fact once, no incentive hype, no telegraphed math beyond the
+   pay rule, no counts, curly quotes only, no em dashes, no bet / wager / stake / gamble / bank / endorser / slots /
+   budget, sentence case, bold only on amounts / percentages / rule words.
+F. VERDICT. Ready to show the PI as a draft? Yes / yes with the fixes in B-E / no. Then your three highest-value
+   changes, each as a concrete before / after.
+Use typographic quotes in any rewrite you propose; no em dashes anywhere in your file.
+Final chat reply: one line (file written, verdict).

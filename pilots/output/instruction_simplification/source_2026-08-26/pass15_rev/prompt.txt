@@ -1,0 +1,56 @@
+You are the WRITER of participant-facing survey instructions (Prolific). You wrote in/Stage-2.md and in/Stage-3.md in
+an earlier session; a Codex reviewer and six simulated readers reviewed them; the architect merged the accepted fixes
+into the list below. Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass15_rev\
+(read in/, write out/). Touch no other file anywhere.
+
+Read in/Stage-2.md, in/Stage-3.md and in/notes_v1.md completely. Then write out/Stage-2.md and out/Stage-3.md that are
+byte-identical to the inputs EXCEPT for the edits below (apply every one; add nothing else; keep every "# " line
+byte-identical and in order; typographic quotes only; no em dashes; no straight quotes).
+
+STAGE 2
+E1. Page 1, the long reviewer sentence ("For each one, a reviewer decides ... shift that chance."): split into two
+    sentences: "For each one, a reviewer decides how much of their own money to place behind the candidate you backed.
+    At the end, the reviewer also chooses how likely it is that one more review comes from you rather than another
+    representative, and can spend money to shift that chance."
+E2. Page 1, "Your decisions shape the view they form of you and of [Vertex/Atlas]." is a claim about what reviewers
+    will feel. Replace with a sentence that is literally true and keeps the point, for example: "What they see is the
+    basis for how they evaluate you and [Vertex/Atlas]." (Choose the most natural true sentence; keep the pair "you
+    and [Vertex/Atlas]".)
+E3. Page 3, first paragraph: replace "Independent reviewers will see it as your confidence in the referral. The more
+    you place, the more of your own pay rides on the candidate, which makes the signal credible." with "The amount is
+    your confidence in the referral, and reviewers see it. The more you place, the more of your own pay rises or falls
+    with the candidate’s result." (Drop "which makes the signal credible": credibility is the reader's judgment, not
+    a fact.)
+E4. Page 3, the accuracy sentence: replace "Being right pays you directly, in proportion to how much you placed, and
+    makes reviewers more willing to follow your next referral and to choose you again." with "Being right pays you in
+    proportion to how much you placed, and reviewers see how each of your referrals turned out before they decide how
+    far to follow your next one and whether to choose you again." (States what reviewers see, not how they will feel.)
+E5. Page 4: no change (the PI's own paragraph).
+
+STAGE 3
+E6. Page 1: "The representative knew that independent reviewers would see the referrals" becomes "... would see some
+    of the referrals" (matches Stage 2, which says "some of your referrals").
+E7. Page 2, last paragraph, replace whole paragraph with: "After your reviews with this representative, you will make
+    one choice about your final review, explained when you reach it, and after that review you will answer one
+    question about this representative. Your placements and your answer may also add to the representative’s bonus;
+    the choice does not. Your own earnings always come from your reviews and from that final choice."
+E8. Page 4 note: "*[Same representative on every review; the profile icon ...]*" becomes "*[Same representative on
+    every review before the final-representative choice; the profile icon is the only difference between the man and
+    woman arms.]*"
+E9. Page 6B: replace "Each step away from **50%** costs one cent more than the previous step:" with "The further you
+    move from **50%**, the more each step costs:" (four of six readers read the old sentence as a flat one-cent ladder).
+E10. Page 6B: replace "This choice affects only which representative your final review comes from." with "This choice
+    affects which representative your final review comes from and how much of the **$0.15** you keep. It does not
+    affect the representative’s bonus."
+E11. Page 6B: move the check item (the bold stem "You set the slider to 70%. What happens?", its three options and
+    the key line) to immediately AFTER the paragraph edited in E10 and BEFORE the organization question. Change the
+    stem to "You set the slider to 70%. What happens, and what do you keep?" Options and key unchanged.
+E12. Page 6B: replace "This organization choice costs **$0.00** and is used only if the draw selects a different
+    representative." with "This organization choice costs **$0.00**. If the draw selects a different representative,
+    they are drawn from the organization you choose here."
+
+Then write out/notes.md: in/notes_v1.md with (a) the word counts updated for the edited pages and (b) a final short
+paragraph "Revision pass" listing E1-E12 as applied in one line each (what changed, in five words or fewer per item).
+Before finishing, diff your outputs against the inputs mentally and confirm nothing outside E1-E12 changed.
+Final chat reply: two lines (files written; word counts of Stage 2 Page 1 and Page 3, Stage 3 Pages 1, 2 and 6B).

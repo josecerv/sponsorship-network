@@ -1,3 +1,5 @@
+> SUPERSEDED 2026-08-21 evening: read `HANDOFF_2026-08-21_evening.md` in this folder first. The notes below describe the Aug 10-11 suggestion pass and are historical.
+
 # HANDOFF — Instruction simplification as Google Doc suggestions
 
 **Written 2026-08-10 evening. Resume 2026-08-11 morning with fresh context.**

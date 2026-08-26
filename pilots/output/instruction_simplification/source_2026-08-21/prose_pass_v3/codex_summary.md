@@ -1,0 +1,5 @@
+Stage 2: Page 1 now contains only the role, must-endorse rule, payoff preview, and reviewer/selection preview; candidate and task background moved to Page 2. Page 2 consolidates visible percentiles, “Unknown,” hidden logical-reasoning scores, no ties, and random organization assignment. Page 3 contains the payoff rule and slider guidance once. Page 4 combines reviewer visibility, reviewer decisions, outcomes, and slot indications. Page 5 consolidates random selection and the three bonus parts; the full payment example and payment timing remain once in their section.
+
+Stage 3: Page 1 now covers review scope, own earnings, and the representative-bonus preview. Page 2 centralizes candidate background and the representative’s information and payoff rule. Page 3 contains decision order, visible fields, the reviewer payoff rule, outcomes, and the three-review earnings example. Page 4 contains random selection, the separate $1.00 percentage scale, review slots, the $2.00 cap, and the own-earnings distinction. Pages 5 through 10 are unchanged, including Page 9.
+
+Uncertainties: none.

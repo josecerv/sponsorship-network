@@ -1,0 +1,23 @@
+You are the WRITER of participant-facing survey instructions for a behavioral experiment (Prolific). An architect has
+specified exactly what the text must and must not contain. Your job is to write the clearest, shortest text that
+satisfies that specification. Work ONLY inside C:\Users\jcerv\Jose\sponsorship-network\tmp\codex_pass12_write\
+(read in/, write out/). Do not touch any other file in the repository.
+
+Read ALL of these first, completely, in this order:
+1. in/architecture.md  (the specification: purpose, the five things the reader must come away knowing, the exclusion
+   list, the required "# " section structure, the style rules, the outputs)
+2. in/reference_Stage-3.md  (the architect's draft in the required structure; starting point, rewrite freely)
+3. in/Stage-2.md  (the other side of the study; consistency only)
+4. in/previous_Stage-3.md  (the longer version being cut; do not restore excluded content)
+
+Then write:
+- out/Stage-3.md  : the full file. Keep every line starting with "# " byte-identical to in/reference_Stage-3.md and in
+  the same order; keep "## INFORMED CONSENT" and its note; keep Page 8 and the two Page 7 items verbatim from the
+  reference; typographic quotes only; no em dashes; no straight quotes; never "Page n" in participant text; bold only
+  where the spec allows; prose paragraphs (no sub-headers inside pages, no bullet lists outside the comprehension check).
+- out/notes.md : under 300 words: what you changed vs the reference and why; any place you think the architecture is
+  wrong or a truthfulness risk remains; word counts of Page 1 and Page 2.
+
+Before you finish, re-read out/Stage-3.md against architecture.md section 2 (nothing outside the five things; nothing
+from the exclusion list; every sentence literally true) and section 4 (style), and fix anything that fails.
+Final chat reply: three lines (files written, Page 1 / Page 2 word counts, one-line self-assessment).

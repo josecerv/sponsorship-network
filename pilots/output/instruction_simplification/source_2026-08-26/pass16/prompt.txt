@@ -1,0 +1,14 @@
+You are the WRITER of participant-facing survey instructions for a behavioral experiment on Prolific. The principal
+investigator reviewed the previous draft and dictated changes; the architect turned them into a short delta brief.
+Work ONLY inside C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass16\
+(read the folder root and in/, write to out/). Touch no other file anywhere.
+
+Read ALL of these first, completely, in this order:
+1. architecture_pass16.md          (the delta brief: what to change, what must stay byte-identical)
+2. in/current_Stage-2.md, in/current_Stage-3.md   (the base text; change only what the brief names)
+3. in/live_cells_2026-08-26.md     (the live Google Doc; the Page 7 text to restore is in cell STAGE 3|9|0)
+
+Then write out/Stage-2.md, out/Stage-3.md and out/notes.md exactly as the brief's section 6 says. Before finishing,
+re-read both outputs against the brief: every named change made, nothing else changed, every "# " line as required,
+typographic quotes only, no em dashes, no banned words, comprehension items still answerable from the text.
+Final chat reply: two lines (files written; the three word counts).

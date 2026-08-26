@@ -1,0 +1,24 @@
+You are an independent reviewer of participant-facing survey instructions for a behavioral experiment run on Prolific. You are reviewing the "Stage 3: independent review" text (the reviewer side) after a simplification pass. Work ONLY inside the folder C:\Users\jcerv\Jose\sponsorship-network\tmp\codex_pass11_review\ (read in/, write out/). Do not touch any other file in the repository.
+
+INPUT FILES (read all of them first, completely):
+- in/Stage-3.md   : the NEW Stage 3 text (v6). This is what you review.
+- in/Stage-2.md   : the Stage 2 text (the representative side). Read for cross-stage consistency only; do not review it.
+- in/Stage-3_previous.md : the PREVIOUS Stage 3 text (v5), for reference. Pages 4 and 9 changed; the "review slots" construct was removed.
+- in/context.md   : design constraints, style rules, and what changed and why.
+
+WHAT CHANGED AND WHAT TO REVIEW:
+Page 4 second part (the sentence starting "The second is two short questions") and Page 9 (the two 0-10 items plus the incentive paragraph) and the Page 8 end-of-review-3 text were rewritten so that reviewers are no longer taught a "review slots" mechanism up front; they are told they will answer two short questions at the end that can add up to $1.00 to the representative's bonus, and the mechanics ($0.05 per unit, both items count, max $1.00, does not affect your own pay) are explained at the point of decision on Page 9. The two items are now phrased as "Suppose you could review more decisions. How many more of this representative's decisions would you want to review? (0 = none, 10 = as many as possible)" and "How many more decisions by [Atlas/Vertex] representatives in general would you want to review?". The underlying design is unchanged: two 0-10 items, each unit adds $0.05 to the representative's bonus if this reviewer is the one picked, max $1.00 combined.
+
+Review Page 4 (second part), Page 8 end text, and Page 9 for:
+(a) clarity for an ordinary Prolific participant reading once, quickly;
+(b) internal consistency with Pages 1, 2, 3, 5 and with Stage 2 Page 4 ("how much more of your work they say they would want to review");
+(c) truthfulness: nothing may imply the reviewer WILL actually review more decisions; every incentive claim must be literally true under the design in context.md; "if you are the reviewer picked" must gate every claim about the representative's bonus;
+(d) style rules in context.md (prose, no sub-headers, bold only on amounts / percentages / rule words, curly quotes only, no em dashes, never the words "Page n" in participant text, each fact stated once per stage);
+(e) whether this is the simplest honest packaging of the two 0-10 items. If you can see a clearly simpler wording for the two items or the incentive paragraph, propose it (at most two alternatives), verbatim.
+Also flag anything in Pages 1-3 or 5 that is now inconsistent because of the change (for example a comprehension-check item that references something that no longer exists), but do not otherwise re-edit those pages.
+
+OUTPUT FILES (write both; stdout is discarded):
+1. out/review.md : numbered findings, most important first, at most 600 words. For each: location (page and quoted phrase), the issue in one or two sentences, and the proposed replacement text verbatim (typographic quotes, no em dashes). End with a one-line overall verdict: "ready to apply" or "apply after fixing items N, M".
+2. out/Stage-3.md : a copy of in/Stage-3.md with ONLY the edits you would actually recommend applied to Page 4 (second part), Page 8 end text and Page 9. Keep every line that starts with "# " byte-identical and in the same order, keep all other pages byte-identical, keep the bracketed *[...]* design notes as they are, use curly quotes only, no em dashes, no "Page n" in participant text, and keep the markdown conventions (**bold** spans, "- " bullets, "---" rules). If you recommend no edits, write an identical copy.
+
+Keep your final chat reply to five lines: which files you wrote, how many findings, and the verdict.

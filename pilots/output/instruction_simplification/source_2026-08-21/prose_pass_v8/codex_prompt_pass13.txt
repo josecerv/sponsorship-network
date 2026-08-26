@@ -1,0 +1,21 @@
+You are the WRITER of participant-facing survey instructions for a behavioral experiment on Prolific. An architect
+has specified exactly what must change in a text you already wrote. Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\tmp\codex_pass13_write\ (read in/, write out/). Touch no other file.
+
+Read ALL of these first, completely, in this order:
+1. in/architecture.md        (this pass: what to restore, what to change, the UI strings to write, outputs)
+2. in/architecture_pass12.md (the base specification: required structure, exclusion list, style rules, truth facts)
+3. in/current_Stage-3.md     (the text now live; start from it and change only what architecture.md asks)
+4. in/Stage-2.md             (the representative side; consistency only)
+
+Then write:
+- out/Stage-3.md    : the full file; every line starting with "# " byte-identical to in/current_Stage-3.md and in the
+  same order; Pages 4, 5, 6, 8 and the consent note byte-identical; typographic quotes only; no em dashes; no
+  straight quotes; never "Page n" in participant text; prose paragraphs; bold only on amounts / percentages / rule
+  words (item stems and options may be bold as in the current file).
+- out/ui_strings.md : the six UI strings U1-U6 from architecture.md section 3, one per line, prefixed by the code.
+- out/notes.md      : under 250 words: what you changed and why; any truthfulness risk; word counts of Page 1 and Page 2.
+
+Before finishing, re-read out/Stage-3.md against architecture.md section 2 (every added sentence literally true; the
+exclusion list still honored; nothing invites generosity in the placements) and fix anything that fails.
+Final chat reply: three lines (files written, Page 1 / Page 2 word counts, one-line self-assessment).

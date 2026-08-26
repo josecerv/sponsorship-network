@@ -1,0 +1,41 @@
+You are the WRITER of participant-facing survey instructions (Prolific). You wrote in/Stage-3.md earlier today. The
+principal investigator reviewed it again and dictated three changes, all in Stage 3. Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass17\
+(read in/, write out/). Touch no other file anywhere.
+
+The PI's words (cleaned): "6B still feels really confusing, the payment stuff. Simplify it and do not do the separate
+payment. They should be using their own money; why are we giving them more money? You do not need a comprehension
+check on it either. And we do not need to say that they are not part of an organization on Stage 3 Page 1."
+
+Read in/Stage-3.md completely. Write out/Stage-3.md byte-identical to it EXCEPT:
+
+C1. Page 1 (YOUR ROLE): delete the first paragraph ("You are an independent reviewer and belong to no organization.")
+    entirely. The page then starts with "You will review decisions made in an earlier study ...". Nothing else on
+    the page changes.
+
+C2. Page 2 (MAKING YOUR REVIEWS), last paragraph: the choice now costs money from the reviewer's own review earnings,
+    so replace the final sentence "Your own earnings always come from your reviews and from that final choice." with
+    "Your own earnings come from your reviews." Nothing else in the paragraph changes.
+
+C3. Page 6B (CHOOSE YOUR FINAL REPRESENTATIVE): rewrite the whole body as three short paragraphs of plain sentences,
+    70 to 100 words in total, NO price list, NO comprehension item, NO "$0.15 for this page", NO "keep":
+    Paragraph 1: your final review can come from this same representative or from a different representative,
+      drawn at random; you set how likely it is to be this representative: 0% means certainly a different one,
+      100% means certainly this one, and 50% means a coin flip.
+    Paragraph 2: leaving the slider at 50% costs nothing; moving it away from 50% costs money from your earnings
+      from the reviews, a little for a small move and more the further you go, up to $0.15 at 0% or 100%; the screen
+      shows the exact cost of the setting you pick.
+    Paragraph 3: the computer then makes one random draw using the chance you set, and that decides who your final
+      review comes from; this choice does not affect the representative's bonus.
+    Architect's reference draft (use, improve, or rewrite; every fact must survive): "Your final review can come from
+    this same representative or from a different representative, drawn at random. You set how likely it is to be this
+    representative: 0% means certainly a different one, 100% means certainly this one, and 50% means a coin flip. /
+    Leaving the slider at 50% costs nothing. Moving it away from 50% costs money from your earnings from the reviews:
+    a little for a small move, more the further you go, and $0.15 at 0% or 100%. The screen shows the exact cost of
+    the setting you pick. / The computer then makes one random draw using the chance you set, and that decides who
+    your final review comes from. This choice does not affect the representative's bonus."
+
+Rules: every "# " line byte-identical; typographic quotes only; no em dashes; no straight quotes; bold only on
+amounts and percentages as elsewhere in the file; no budget / bet / wager / stake / bank; nothing outside C1-C3
+changes. Write out/notes.md: one line with the Page 6B word count and one line listing any sentence you were unsure
+is literally true. Final chat reply: one line.

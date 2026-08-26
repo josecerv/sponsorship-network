@@ -1,0 +1,39 @@
+You are the WRITER of participant-facing survey instructions (Prolific). You wrote in/Stage-2.md earlier today. The
+principal investigator read Page 1 and said: "It feels weak. Very unmotivating. It doesn't simulate the experience of
+being in an organization." The sentence he means is: "You have been assigned to [Vertex/Atlas], an organization whose
+candidates completed a set of tasks and are compared with candidates from other organizations." He wants the page to
+feel like joining an organization that has something at stake in you. Work ONLY inside
+C:\Users\jcerv\Jose\sponsorship-network\pilots\output\instruction_simplification\source_2026-08-26\pass18\
+(read in/, write out/). Touch no other file anywhere.
+
+Read in/Stage-2.md completely (Pages 2-4 are approved and must stay byte-identical). Then rewrite ONLY the body of
+"# PAGE 1: YOUR ROLE" and write the full file to out/Stage-2.md. Also write out/Page1_variants.md with TWO further
+complete alternatives for the Page 1 body (labelled VARIANT B and VARIANT C), each taking a different angle, so the
+PI can pick. Word limit for each version: 110-150 words, three short paragraphs.
+
+What Page 1 must do, in this order:
+1. Welcome the participant INTO the organization (onboarding voice, second person, present tense). Give [Vertex/Atlas]
+   an identity a participant can inhabit: what it is in this study and what it is trying to do. The literal facts you
+   may build on: [Vertex/Atlas] is an organization in this study; it has candidates (real people from an earlier
+   study who completed three timed tasks); it puts those candidates forward, against candidates from other
+   organizations, to independent reviewers; it depends on its representatives to speak for its candidates. You may
+   name what kind of organization it is in plain, role-play terms (for example a talent organization that puts its
+   people forward for review) as long as no sentence claims something that would be false about the study (no real
+   employers, no jobs, no training, no history, no "clients").
+2. The role, as membership: as a representative of [Vertex/Atlas], you speak for its candidates; each review compares
+   one [Vertex/Atlas] candidate with a candidate from another organization; you decide how much of $0.50 to place
+   behind the [Vertex/Atlas] candidate; you always back [Vertex/Atlas], the only decision is how much, so place the
+   amount that best reflects your judgment.
+3. The stakes, plainly and truthfully: in a separate study, independent reviewers will see some of your decisions
+   and decide how far to follow each one with their own money, and whether they want more of your decisions; they
+   form their view of you, and of [Vertex/Atlas], from those decisions (TRUE: reviewers are asked about both). Your
+   bonus depends on one of your reviewed decisions, picked at random, so any decision could count.
+
+Voice: warm and specific, like a first-day briefing, not corporate hype; no exclamation marks, no "exciting", no
+"we are thrilled"; no bet / wager / stake / gamble / bank / budget; no "two organizations", no "staffing agency"
+(he rejected that framing), no Stage 3 mechanics (no chance slider, no $0.15). Typographic quotes only; no em dashes;
+bold only on $0.50 and on "one of your reviewed decisions, picked at random" as in the current file. The three
+"# PAGE" lines and every other line outside Page 1 byte-identical.
+
+Write out/notes.md: word counts of the main version and the two variants; the identity phrase you used in each.
+Final chat reply: one line.

@@ -1,0 +1,20 @@
+You are the WRITER of participant-facing survey instructions for a behavioral experiment on Prolific. The author
+reviewed your previous text and dictated changes to Page 1; the architect turned them into a short brief. Work ONLY
+inside C:\Users\jcerv\Jose\sponsorship-network\tmp\codex_pass14_write\ (read in/, write out/). Touch no other file.
+
+Read ALL of these first, completely, in this order:
+1. in/architecture.md         (this pass: the author's verbatim review, what Page 1 must still do, the CQ item 2 swap)
+2. in/current_Stage-3.md      (the live text; change ONLY Page 1 and comprehension-check item 2 + its key note)
+3. in/architecture_pass13.md  (the audience frame, for context)
+4. in/architecture_pass12.md  (base specification: structure, exclusion list, style rules, truth facts)
+
+Then write:
+- out/Stage-3.md : the full file; every line starting with "# " byte-identical to in/current_Stage-3.md and in the same
+  order; everything except Page 1 and CQ item 2 (+ the programming-key note) byte-identical; typographic quotes only;
+  no em dashes; no straight quotes; never "Page n" in participant text; prose; bold only on amounts / percentages /
+  rule words (item stems and options may be bold as in the current file).
+- out/notes.md : under 150 words: Page 1 word count; the new item 2 and why its distractors are fair.
+
+Before finishing, re-read out/Stage-3.md against architecture.md (every kept fact present, the two removed sentences
+gone, nothing from the exclusion list, item 2 answerable from the new Page 1) and fix anything that fails.
+Final chat reply: two lines (files written; Page 1 word count).
